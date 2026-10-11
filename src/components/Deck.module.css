@@ -1,0 +1,247 @@
+/* Positions use --u (px per Figma px), set by the stage, so the DOM overlay
+   stays locked to the 3D scene at any screen size. Origin = screen centre. */
+
+.root {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  background: #fff;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.overlay a {
+  pointer-events: auto;
+}
+
+/* Hero: sits where the name used to, above the shelf. Scales down with the
+   scene on short screens so it never runs into the sticky note. */
+.hero {
+  position: absolute;
+  left: 50%;
+  top: calc(50% - 335px * var(--u, 1));
+  width: max-content;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  transform: translate(-50%, -50%) scale(min(1, var(--u, 1)));
+}
+
+.heroArt {
+  flex: none;
+  width: 54px;
+  height: auto;
+}
+
+.heroText {
+  width: 460px;
+}
+
+.headline {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -3.5px;
+  color: #000;
+  white-space: nowrap;
+}
+
+.role {
+  margin: 4px 0 10px;
+  font-size: 14px;
+  line-height: 16px;
+  letter-spacing: -1px;
+  color: #ce0e9b;
+}
+
+.intro {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.35;
+  letter-spacing: -1px;
+  color: #8a8a8a;
+}
+
+@media (max-width: 720px) {
+  .hero {
+    /* nudged down to clear the nav */
+    top: calc(50% - 335px * var(--u, 1) + 12px);
+    width: calc(100vw - 32px);
+    transform: translate(-50%, -50%);
+  }
+
+  .heroText {
+    width: 100%;
+  }
+
+  .headline {
+    white-space: normal;
+  }
+
+  .intro {
+    font-size: 13px;
+  }
+}
+
+/* Drop message — sits in the dropped tape's empty spot on the shelf */
+.oopsAnchor {
+  position: absolute;
+  left: 50%;
+  top: calc(50% - var(--row-y) * 1px * var(--u, 1));
+  transform: translate(-50%, -50%);
+}
+
+.oops {
+  margin: 0;
+  font-family: var(--font-caveat), cursive;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 24px;
+  color: #ce0e9b;
+  white-space: nowrap;
+}
+
+/* Sticky note: Figma Frame 3 — 103 left of centre, 111 above the shelf row.
+   Grows with the title; the paper edge SVG stretches to fit. */
+.noteAnchor {
+  position: absolute;
+  left: calc(50% - 103px * var(--u, 1));
+  top: calc(50% - (var(--row-y) + 111) * 1px * var(--u, 1));
+  transform: translate(-50%, -50%);
+}
+
+.note {
+  display: flex;
+  align-items: center;
+  min-width: 86px;
+  height: 32px;
+  padding: 8px 14px;
+  background: url('/sticky-note.svg') no-repeat center / 100% 100%;
+  font-size: 14px;
+  line-height: 16px;
+  letter-spacing: -1px;
+  color: #000;
+  white-space: nowrap;
+  transform-origin: center;
+}
+
+/* Name: dotted underline; hover/focus shows a hand-written aside + arrow */
+.nameTag {
+  position: relative;
+  display: inline-block;
+  pointer-events: auto;
+  outline: none;
+  cursor: default;
+  /* One continuous dotted line (text-decoration would be drawn per letter
+     and overlap with the tight tracking). */
+  padding-bottom: 3px;
+  background: radial-gradient(circle, #b5b5b5 1px, transparent 1.4px) left bottom / 5px 3px repeat-x;
+}
+
+.nickname {
+  position: absolute;
+  left: 82%;
+  bottom: 72%;
+  display: flex;
+  align-items: flex-start;
+  gap: 2px;
+  color: #ce0e9b;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.25s ease;
+}
+
+.nickname svg {
+  flex: none;
+  margin-top: 10px;
+}
+
+.nicknameArrow {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 0.35s ease 0.05s;
+}
+
+.nicknameText {
+  font-family: var(--font-caveat), cursive;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: 0;
+  white-space: nowrap;
+  transform: rotate(-6deg);
+  text-decoration: none;
+}
+
+.nameTag:hover .nickname,
+.nameTag:focus-visible .nickname {
+  opacity: 1;
+  transform: none;
+}
+
+.nameTag:hover .nicknameArrow,
+.nameTag:focus-visible .nicknameArrow {
+  stroke-dashoffset: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nickname,
+  .nicknameArrow {
+    transition: none;
+  }
+}
+
+.hint {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + (130 - var(--player-y)) * 1px * var(--u, 1));
+  transform: translateX(-50%);
+  margin: 0;
+  font-size: 14px;
+  letter-spacing: -0.5px;
+  color: #8a8a8a;
+  white-space: nowrap;
+}
+
+.footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 16px;
+  text-align: center;
+  font-size: 11px;
+  color: #b0b0b0;
+}
+
+.footer a {
+  color: inherit;
+}
+
+.fade {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  pointer-events: none;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

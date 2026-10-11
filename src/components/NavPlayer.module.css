@@ -1,0 +1,163 @@
+/* A tiny Mac-System-7-ish player panel. Bevels are 1px borders:
+   light on top/left, dark on bottom/right (or the reverse for inset fields). */
+
+.window {
+  --face: #c9c9c9;
+  --light: #ffffff;
+  --shade: #8a8a8a;
+  --ink: #000;
+
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 50;
+  width: 264px;
+  background: var(--face);
+  border: 1px solid var(--ink);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.85);
+  font-family: var(--font-vt323), monospace;
+  color: var(--ink);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.body {
+  padding: 6px;
+  border-top: 1px solid var(--light);
+  border-left: 1px solid var(--light);
+  border-right: 1px solid var(--shade);
+  border-bottom: 1px solid var(--shade);
+}
+
+.row {
+  display: flex;
+  gap: 4px;
+}
+
+.select {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Inset white field with the bevelled ▼ button on the right */
+.field {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  height: 24px;
+  padding: 0;
+  background: #fff;
+  border: 1px solid var(--ink);
+  box-shadow: inset 1px 1px 0 var(--shade);
+  font: inherit;
+  font-size: 20px;
+  line-height: 1;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.fieldText {
+  flex: 1;
+  min-width: 0;
+  padding: 2px 5px 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.arrow {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  background: var(--face);
+  border-left: 1px solid var(--ink);
+  box-shadow:
+    inset 1px 1px 0 var(--light),
+    inset -1px -1px 0 var(--shade);
+}
+
+.field:active .arrow,
+.field[aria-expanded='true'] .arrow {
+  box-shadow:
+    inset 1px 1px 0 var(--shade),
+    inset -1px -1px 0 var(--light);
+}
+
+.field:focus-visible,
+.button:focus-visible {
+  outline: 2px dotted var(--ink);
+  outline-offset: 2px;
+}
+
+.button {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 24px;
+  padding: 0;
+  background: var(--face);
+  border: 1px solid var(--ink);
+  box-shadow:
+    inset 1px 1px 0 var(--light),
+    inset -1px -1px 0 var(--shade);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.button:active {
+  box-shadow:
+    inset 1px 1px 0 var(--shade),
+    inset -1px -1px 0 var(--light);
+}
+
+.button:active svg {
+  transform: translate(1px, 1px);
+}
+
+/* Pop-up menu */
+.menu {
+  position: absolute;
+  z-index: 2;
+  top: calc(100% + 2px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 2px 0;
+  list-style: none;
+  background: #fff;
+  border: 1px solid var(--ink);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.85);
+  font-size: 20px;
+  line-height: 22px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  padding: 0 6px 0 2px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.option[data-active] {
+  background: var(--ink);
+  color: #fff;
+}
+
+.check {
+  width: 16px;
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .window {
+    top: 10px;
+    right: 10px;
+    left: 62px;
+    width: auto;
+  }
+}

@@ -1,0 +1,20 @@
+.position {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 50;
+}
+
+/* On phones the nav takes the top row, so the button shrinks to its icon. */
+@media (max-width: 720px) {
+  .position {
+    top: 10px;
+    left: 10px;
+    height: 34px;
+    padding: 0 7px;
+  }
+
+  .label {
+    display: none;
+  }
+}

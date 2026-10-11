@@ -1,0 +1,61 @@
+/* Mirrors the home page hero: small logo above a 28px medium name, scaled by
+   --u (px per design px) exactly like the home hero on shorter windows. */
+/* Logo lands exactly where the home page's does. The home hero (180px tall,
+   168px on phones) is centred 335 design px above the middle and scales by
+   min(1, --u), so its top edge — the logo — sits at the same calc as here. */
+.title {
+  position: fixed;
+  top: calc(50% - 335px * var(--u, 1) - 90px * min(1, var(--u, 1)));
+  left: 50%;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  transform: translateX(-50%) scale(min(1, var(--u, 1)));
+  transform-origin: top center;
+  pointer-events: none;
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+
+/* Out of the way while brewing; the guide windows take over. */
+.title[data-hidden] {
+  opacity: 0;
+  transform: translate(-50%, -8px) scale(min(1, var(--u, 1)));
+}
+
+.logo {
+  width: 54px;
+  height: auto;
+}
+
+.name {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -3.5px;
+  color: #000;
+  white-space: nowrap;
+}
+
+/* The same continuous dotted line as under the name on the home page. */
+.underline {
+  display: inline-block;
+  padding-bottom: 3px;
+  background: radial-gradient(circle, #b5b5b5 1px, transparent 1.4px) left bottom / 5px 3px repeat-x;
+}
+
+/* On phones the home hero isn't scaled either. */
+@media (max-width: 720px) {
+  .title {
+    top: calc(50% - 335px * var(--u, 1) + 12px - 84px);
+    transform: translateX(-50%);
+  }
+
+  .title[data-hidden] {
+    transform: translate(-50%, -8px);
+  }
+}

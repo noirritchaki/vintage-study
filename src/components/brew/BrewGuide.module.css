@@ -1,0 +1,131 @@
+/* Floating guide, left of the set (the kettle's spout comes in from the right).
+   Plain type on the white page, in the site's Inter. */
+.guide {
+  position: fixed;
+  z-index: 40;
+  top: 104px;
+  left: 40px;
+  width: 280px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.clock {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.2px;
+  color: #8a8a8a;
+}
+
+.headline {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -1.4px;
+}
+
+.go {
+  color: #000;
+}
+
+.wait {
+  color: #555;
+}
+
+.warn,
+.done {
+  color: #ce0e9b;
+}
+
+.detail {
+  margin: 6px 0 14px;
+  font-size: 14px;
+  line-height: 1.35;
+  letter-spacing: -0.4px;
+  color: #8a8a8a;
+}
+
+.meter {
+  position: relative;
+  height: 2px;
+  background: #ececec;
+}
+
+.fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: #000;
+  transition: width 0.12s linear;
+}
+
+.meterLabel {
+  margin: 6px 0 0;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: #000;
+}
+
+.meterLabel span {
+  color: #b0b0b0;
+}
+
+.again {
+  margin-top: 4px;
+}
+
+/* Recipe */
+.steps {
+  margin: 36px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  line-height: 24px;
+  letter-spacing: -0.3px;
+  font-variant-numeric: tabular-nums;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 76px 1fr auto;
+  gap: 8px;
+  color: #c2c2c2;
+  transition: color 0.2s ease;
+}
+
+.step[data-done] {
+  color: #8a8a8a;
+}
+
+.step[data-current] {
+  color: #000;
+  font-weight: 500;
+}
+
+.actual {
+  color: #ce0e9b;
+}
+
+/* Phones: just the current instruction, centred under the nav. */
+@media (max-width: 720px) {
+  .guide {
+    top: 62px;
+    left: 16px;
+    right: 16px;
+    width: auto;
+    text-align: center;
+  }
+
+  .headline {
+    font-size: 24px;
+  }
+
+  .detail {
+    margin-bottom: 10px;
+  }
+
+  .steps {
+    display: none;
+  }
+}

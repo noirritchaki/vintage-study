@@ -1,0 +1,23 @@
+.char {
+  opacity: 0;
+  animation: type 0.22s ease-out var(--d) forwards;
+  white-space: pre;
+}
+
+@keyframes type {
+  from {
+    opacity: 0;
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .char {
+    animation: none;
+    opacity: 1;
+  }
+}
