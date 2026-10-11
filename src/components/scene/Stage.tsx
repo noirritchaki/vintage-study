@@ -7,6 +7,7 @@ import { EffectComposer } from '@react-three/postprocessing';
 import { CuboidCollider, Physics, RigidBody } from '@react-three/rapier';
 import { useDeck, viewState } from '@/lib/store';
 import { FallingTape } from './FallingTape';
+import { WarmUp } from '../WarmUp';
 import { FocusBlur } from './FocusBlur';
 import { Player } from './Player';
 import { Shelf } from './Shelf';
@@ -15,9 +16,9 @@ import { FOV, PLAYER_BOX, PLAYER_Y, ROW_Y, fitCamera } from './layout';
 /** Scene units per metre are ~1100, so this is a touch lighter than real. */
 const GRAVITY = -6500;
 
-type Props = { labelFont: string };
+type Props = { labelFont: string; onReady?: () => void };
 
-export default function Stage({ labelFont }: Props) {
+export default function Stage({ labelFont, onReady }: Props) {
   return (
     <Canvas
       dpr={[1, 2]}
@@ -25,12 +26,12 @@ export default function Stage({ labelFont }: Props) {
       style={{ position: 'absolute', inset: 0 }}
     >
       <color attach="background" args={['#ffffff']} />
-      <Scene labelFont={labelFont} />
+      <Scene labelFont={labelFont} onReady={onReady} />
     </Canvas>
   );
 }
 
-function Scene({ labelFont }: Props) {
+function Scene({ labelFont, onReady }: Props) {
   const { size, viewport } = useThree();
   const aspect = size.width / size.height;
   const fit = fitCamera(aspect);
@@ -73,6 +74,8 @@ function Scene({ labelFont }: Props) {
           </RigidBody>
           {falling && <FallingTape labelFont={labelFont} />}
         </Physics>
+        {/* Runs once everything above has loaded: compiles shaders, then signals ready. */}
+        <WarmUp onReady={() => onReady?.()} />
       </Suspense>
 
       <EffectComposer multisampling={4}>

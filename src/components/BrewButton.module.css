@@ -1,20 +1,48 @@
-.position {
+.button {
   position: fixed;
-  top: 16px;
-  left: 16px;
+  top: 18px;
+  left: 18px;
   z-index: 50;
+  display: block;
+  line-height: 0;
+  border-radius: 8px;
 }
 
-/* On phones the nav takes the top row, so the button shrinks to its icon. */
+.icon {
+  display: block;
+  width: 28px;
+  height: auto;
+  transform-origin: 50% 90%;
+  transition: transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+/* a little perk-up on hover */
+.button:hover .icon {
+  transform: rotate(-8deg) scale(1.06);
+}
+
+.button:active .icon {
+  transform: scale(0.94);
+}
+
+.button:focus-visible {
+  outline: 2px dotted #000;
+  outline-offset: 4px;
+}
+
 @media (max-width: 720px) {
-  .position {
-    top: 10px;
-    left: 10px;
-    height: 34px;
-    padding: 0 7px;
+  .button {
+    top: 16px;
+    left: 16px;
   }
 
-  .label {
-    display: none;
+  .icon {
+    width: 26px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .icon {
+    transition: none;
   }
 }

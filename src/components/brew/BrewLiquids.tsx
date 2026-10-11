@@ -7,7 +7,7 @@ import { sim } from './brewSim';
 import { BED_TOP, STAND, dripperY, paperRadiusAt } from './brewLayout';
 import { carafeR, lathe, type Pt } from './dripperGeometry';
 import { kettleTip } from './PouringKettle';
-import { makeFoamTexture } from './foamTexture';
+import { useFoamTexture } from './brewTextures';
 
 // Foam texture shows through at full strength during the bloom (white tint),
 // then the tint darkens it to plain brewing coffee.
@@ -22,7 +22,6 @@ const water = new MeshPhysicalMaterial({
   envMapIntensity: 2.5,
 });
 const drip = new MeshPhysicalMaterial({ color: '#4a2410', transparent: true, opacity: 0, roughness: 0.1 });
-let foamMap: ReturnType<typeof makeFoamTexture> | null = null;
 const slurry = new MeshPhysicalMaterial({
   color: BREW,
   transparent: true,
@@ -80,6 +79,12 @@ const DRIP = new CylinderGeometry(0.0008, 0.0011, 1, 10, 1, true);
 
 /** Everything wet: slurry in the filter, the pour stream, the drip, the carafe. */
 export function BrewLiquids() {
+  // Set up front (not on the first pour) so the slurry shader never recompiles mid-brew.
+  const foam = useFoamTexture();
+  useEffect(() => {
+    slurry.map = foam;
+    slurry.needsUpdate = true;
+  }, [foam]);
   const surface = useRef<Mesh>(null);
   const stream = useRef<Mesh>(null);
   const dripStream = useRef<Mesh>(null);
@@ -104,11 +109,6 @@ export function BrewLiquids() {
       const r = paperRadiusAt(sy) - 0.0004;
       surface.current.position.set(0, sy, 0);
       surface.current.scale.set(r, 1, r);
-      if (!foamMap) {
-        foamMap = makeFoamTexture();
-        slurry.map = foamMap;
-        slurry.needsUpdate = true;
-      }
       slurry.color.copy(BREW).lerp(FOAM, sim.bloom * 0.9);
       slurry.opacity = Math.min(0.95, 0.35 + sim.free / 12);
     }

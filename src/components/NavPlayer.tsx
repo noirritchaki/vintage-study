@@ -58,6 +58,9 @@ export function NavPlayer() {
     e.preventDefault();
   };
 
+  // Case studies are for reading: no nav, just the eject link.
+  if (pathname.startsWith('/work')) return null;
+
   return (
     <div ref={root} className={styles.window} data-nav>
       <div className={styles.body}>

@@ -42,6 +42,20 @@
   height: auto;
 }
 
+/* While the intro loader is up, the real logo hides (the loader's copy flies
+   onto it) and the text waits, then fades in once the logo has landed. */
+.hero[data-intro] .heroArt {
+  visibility: hidden;
+}
+
+.hero .heroText {
+  transition: opacity 0.5s ease;
+}
+
+.hero[data-intro] .heroText {
+  opacity: 0;
+}
+
 .heroText {
   width: 460px;
 }

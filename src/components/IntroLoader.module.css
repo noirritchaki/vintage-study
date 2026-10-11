@@ -1,0 +1,54 @@
+.cover {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 1);
+  transition: background-color 0.7s ease 0.15s;
+}
+
+/* The white fades out while the logo flies, revealing the scene behind it. */
+.cover[data-leaving] {
+  background: rgba(255, 255, 255, 0);
+  pointer-events: none;
+}
+
+.fly {
+  transform-origin: center;
+  will-change: transform;
+}
+
+.float {
+  animation: float 2.2s ease-in-out infinite;
+}
+
+.logo {
+  display: block;
+  width: 108px;
+  height: auto;
+}
+
+/* A slow bob and a little lean, like it's waiting. */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  30% {
+    transform: translateY(-7px) rotate(-3deg);
+  }
+  65% {
+    transform: translateY(2px) rotate(2deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .float {
+    animation: none;
+  }
+
+  .cover {
+    transition: background-color 0.25s linear;
+  }
+}

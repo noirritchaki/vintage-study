@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "models": "node scripts/split-glb.mjs"
+    "models": "node scripts/split-glb.mjs",
+    "textures": "node scripts/bake-textures.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.9",

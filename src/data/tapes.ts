@@ -13,16 +13,17 @@ export type Tape = {
   variant: number;
 };
 
-// Placeholder content — swap these for real case studies.
+// Case studies 02–04 are still placeholders. Long-form content lives in
+// caseStudies.ts, keyed by slug.
 // Order here is the order on the shelf; the row loops around.
 export const tapes: Tape[] = [
   {
-    slug: 'case-study-one',
+    slug: 'killing-the-dur',
     kind: 'work',
-    title: 'Case Study 01',
-    summary: 'A short line about the problem this project solved.',
+    title: 'Killing the DUR',
+    summary: 'Rebuilding how people claim their health money',
     year: '2026',
-    role: 'Lead product designer',
+    role: 'Product Designer',
     variant: 0,
   },
   {

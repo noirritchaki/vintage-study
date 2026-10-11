@@ -13,6 +13,7 @@ const BrewScene = dynamic(() => import('./BrewScene'), { ssr: false });
 
 export function BrewPage() {
   const [view, setView] = useState<View>('overview');
+  const [ready, setReady] = useState(false);
   const toggle = () => setView((v) => (v === 'overview' ? 'brew' : 'overview'));
 
   useEffect(() => {
@@ -25,7 +26,13 @@ export function BrewPage() {
 
   return (
     <main className={styles.root}>
-      <BrewScene view={view} onToggle={toggle} />
+      {/* Hidden until every model, texture and shader is ready, then faded in. */}
+      <div className={styles.stage} data-ready={ready || undefined}>
+        <BrewScene view={view} onToggle={toggle} onReady={() => setReady(true)} />
+      </div>
+      <p className={styles.loading} data-ready={ready || undefined} aria-hidden={ready}>
+        warming up the kettle…
+      </p>
 
       <Link href="/" className={`${retro.button} ${styles.back}`} aria-label="Back home">
         ⏏<span className={styles.backLabel}> back</span>
@@ -35,7 +42,13 @@ export function BrewPage() {
       {view === 'brew' && <BrewGuide />}
 
       <div className={styles.footer}>
-        <button type="button" className={retro.button} onClick={toggle} aria-pressed={view === 'brew'}>
+        <button
+          type="button"
+          className={retro.button}
+          onClick={toggle}
+          aria-pressed={view === 'brew'}
+          disabled={!ready}
+        >
           {view === 'overview' ? 'brew a cup' : 'step back'}
         </button>
         <p className={styles.caption}>

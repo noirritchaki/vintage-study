@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="10 0 104 112" fill="none" stroke="#1a1a1a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+  <!-- steam -->
+  <path d="M47 34c-7-6 7-11 1-19-2-3-2-6 0-9"/>
+  <path d="M66 33c-7-6 7-11 1-19-2-3-2-6 0-9"/>
+  <!-- handle (ends tucked under the mug, which is filled white to hide them) -->
+  <path d="M88 58c13-2 18 6 16 14s-8 14-20 14"/>
+  <!-- mug, a little wonky like the logo -->
+  <path d="M22 46.3c13.6-2.2 47.6-3.2 68.4-1.1 2 .2 3 1.6 2.9 3.6-.6 17.3-1.7 36.4-6.4 48.6-2.4 6.1-7.4 9.7-14 10.2-9.8.8-19.5.9-29.2.2-7-.5-12.2-4.4-14.6-10.8-4.3-11.5-6.4-28.5-6.9-46.6 0-2.2 1.2-3.6 3.9-3.7z" fill="#fff"/>
+</svg>

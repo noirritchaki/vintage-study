@@ -23,8 +23,12 @@ import { SCALE_YAW, STAND } from './brewLayout';
 import { GlassEdges } from './GlassEdges';
 import { PouringKettle } from './PouringKettle';
 import { Scale } from './Scale';
+import { WarmUp } from '../WarmUp';
 import { makeGlazeRings } from './glazeTexture';
-import { makeGroundsTextures } from './groundsTexture';
+import { preloadBrewTextures, useGroundsTexture } from './brewTextures';
+
+// Start fetching textures as soon as this module loads (e.g. prefetched from home).
+preloadBrewTextures();
 
 // Colours from the Blender script (linear) — three converts them for display.
 const CERAMIC = new Color().setRGB(0.93, 0.92, 0.89);
@@ -82,15 +86,16 @@ export type View = keyof typeof VIEWS;
 const FOV = 28.8;
 const goal = new Vector3();
 
-type Props = { view: View; onToggle: () => void };
+type Props = { view: View; onToggle: () => void; onReady?: () => void };
 
-export default function BrewScene({ view, onToggle }: Props) {
+export default function BrewScene({ view, onToggle, onReady }: Props) {
   return (
     <Canvas
       shadows
       dpr={[1, 2]}
       camera={{ fov: FOV, near: 0.01, far: 10, position: VIEWS.overview.position.toArray() }}
       style={{ position: 'absolute', inset: 0 }}
+      onCreated={({ camera }) => camera.lookAt(VIEWS.overview.target)}
     >
       <color attach="background" args={['#ffffff']} />
       <CameraRig view={view} />
@@ -103,6 +108,7 @@ export default function BrewScene({ view, onToggle }: Props) {
         </group>
         <BrewLiquids />
         <PouringKettle active={view === 'brew'} />
+        <WarmUp onReady={() => onReady?.()} />
       </Suspense>
       <BrewRunner active={view === 'brew'} />
       <Set />
@@ -151,7 +157,7 @@ function PourOver({ onClick }: { onClick?: () => void }) {
     }),
     [],
   );
-  const grounds = useMemo(() => makeGroundsTextures(), []);
+  const grounds = useGroundsTexture();
   const glaze = useMemo(() => makeGlazeRings(), []);
   const bedMaterial = useRef<MeshStandardMaterial>(null);
   const bed = useRef<Group>(null);
@@ -164,11 +170,9 @@ function PourOver({ onClick }: { onClick?: () => void }) {
   useEffect(
     () => () => {
       Object.values(geo).forEach((g) => g.dispose());
-      grounds.map.dispose();
-      grounds.bump.dispose();
       glaze.dispose();
     },
-    [geo, grounds, glaze],
+    [geo, glaze],
   );
 
   return (
@@ -211,8 +215,8 @@ function PourOver({ onClick }: { onClick?: () => void }) {
         <mesh geometry={geo.bed} receiveShadow>
           <meshStandardMaterial
             ref={bedMaterial}
-            map={grounds.map}
-            bumpMap={grounds.bump}
+            map={grounds}
+            bumpMap={grounds}
             bumpScale={1.2}
             roughness={0.85}
           />
