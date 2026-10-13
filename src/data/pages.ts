@@ -1,18 +1,13 @@
-// The site's top-level pages, in "track" order for the Now Playing nav.
+// The site's top-level pages, in the order the nav lists them.
 export const pages = [
   { name: 'home', href: '/' },
   { name: 'about', href: '/about' },
   { name: 'what i like doing', href: '/hobbies' },
   { name: 'projects', href: '/projects' },
+  { name: 'brew a cup of coffee', href: '/brew' },
 ] as const;
 
-/** Pages that aren't in the dropdown but still get a name in the nav. */
-const extras: Record<string, string> = { '/brew': 'brew a coffee' };
-
-/**
- * Which page a path belongs to: its index in `pages`, or -1 for an extra
- * page. Case studies live under projects.
- */
+/** Which page a path belongs to (its index in `pages`). Case studies live under projects. */
 export function pageIndexFor(pathname: string) {
   if (pathname === '/') return 0;
   if (pathname.startsWith('/work')) return pages.findIndex((p) => p.href === '/projects');
@@ -21,5 +16,5 @@ export function pageIndexFor(pathname: string) {
 
 export function pageNameFor(pathname: string) {
   const i = pageIndexFor(pathname);
-  return i >= 0 ? pages[i].name : (extras[pathname] ?? pages[0].name);
+  return pages[Math.max(0, i)].name;
 }

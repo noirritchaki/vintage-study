@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useEffect, useRef } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
-import { Plane, Raycaster, Vector2, Vector3 } from 'three';
-import { advance, sim, useBrewUI } from './brewSim';
-import { BED_TOP, paperRadiusAt } from './brewLayout';
+import { useEffect, useRef } from "react";
+import { useFrame, useThree } from "@react-three/fiber";
+import { Plane, Raycaster, Vector2, Vector3 } from "three";
+import { advance, sim, useBrewUI } from "./brewSim";
+import { BED_TOP, paperRadiusAt } from "./brewLayout";
 
 const raycaster = new Raycaster();
 const plane = new Plane(new Vector3(0, 1, 0), 0);
@@ -45,7 +45,10 @@ export function BrewRunner({ active }: { active: boolean }) {
     const el = gl.domElement;
     const toNdc = (e: PointerEvent) => {
       const rect = el.getBoundingClientRect();
-      return [((e.clientX - rect.left) / rect.width) * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1] as const;
+      return [
+        ((e.clientX - rect.left) / rect.width) * 2 - 1,
+        -((e.clientY - rect.top) / rect.height) * 2 + 1,
+      ] as const;
     };
     const down = (e: PointerEvent) => {
       const [x, y] = toNdc(e);
@@ -57,21 +60,27 @@ export function BrewRunner({ active }: { active: boolean }) {
     };
     const up = () => (sim.pouring = false);
     const key = (e: KeyboardEvent) => {
-      if (e.code !== 'Space' || (e.target as HTMLElement)?.closest?.('button, a, [data-nav]')) return;
+      if (
+        e.code !== "Space" ||
+        (e.target as HTMLElement)?.closest?.(
+          "button, a, input, textarea, [data-nav], [data-chat]",
+        )
+      )
+        return;
       e.preventDefault();
-      sim.pouring = e.type === 'keydown';
+      sim.pouring = e.type === "keydown";
     };
-    el.addEventListener('pointerdown', down);
-    window.addEventListener('pointerup', up);
-    window.addEventListener('pointercancel', up);
-    window.addEventListener('keydown', key);
-    window.addEventListener('keyup', key);
+    el.addEventListener("pointerdown", down);
+    window.addEventListener("pointerup", up);
+    window.addEventListener("pointercancel", up);
+    window.addEventListener("keydown", key);
+    window.addEventListener("keyup", key);
     return () => {
-      el.removeEventListener('pointerdown', down);
-      window.removeEventListener('pointerup', up);
-      window.removeEventListener('pointercancel', up);
-      window.removeEventListener('keydown', key);
-      window.removeEventListener('keyup', key);
+      el.removeEventListener("pointerdown", down);
+      window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", up);
+      window.removeEventListener("keydown", key);
+      window.removeEventListener("keyup", key);
       sim.pouring = false;
     };
     // landingAt only reads refs/camera
@@ -79,13 +88,16 @@ export function BrewRunner({ active }: { active: boolean }) {
   }, [active, gl, camera]);
 
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') (window as unknown as { __brew: unknown }).__brew = sim;
+    if (process.env.NODE_ENV === "development")
+      (window as unknown as { __brew: unknown }).__brew = sim;
   }, []);
 
   useFrame((_, dt) => {
     // Dev-only: window.__brewSpeed fast-forwards a brew for testing.
     const speed =
-      process.env.NODE_ENV === 'development' ? ((window as unknown as { __brewSpeed?: number }).__brewSpeed ?? 1) : 1;
+      process.env.NODE_ENV === "development"
+        ? ((window as unknown as { __brewSpeed?: number }).__brewSpeed ?? 1)
+        : 1;
     const step = Math.min(dt, 0.1) * speed;
     if (sim.pouring) {
       const p = landingAt(pointer.x, pointer.y, true);

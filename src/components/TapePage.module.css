@@ -6,7 +6,7 @@
   color: var(--ink);
   max-width: 760px;
   margin: 0 auto;
-  padding: 64px 24px 120px;
+  padding: 96px 24px 120px; /* clears the fixed nav in the top-left */
   animation: fadeIn 0.6s ease both;
 }
 

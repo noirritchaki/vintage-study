@@ -200,7 +200,7 @@ export function Deck({ labelFont }: { labelFont: string }) {
     const onKey = (e: KeyboardEvent) => {
       unlockAudio();
       if (e.key === "Enter" || e.key === " ") {
-        if ((e.target as HTMLElement)?.closest("a,button")) return;
+        if ((e.target as HTMLElement)?.closest("a,button,input,textarea,[data-chat]")) return;
         e.preventDefault();
         insert();
       }

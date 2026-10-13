@@ -40,3 +40,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 assets/*.glb
+
+# example env file is safe to commit
+!.env.example

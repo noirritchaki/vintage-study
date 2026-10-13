@@ -19,8 +19,8 @@ export function useShelfWheel() {
     let timer: ReturnType<typeof setTimeout> | undefined;
 
     const onWheel = (e: WheelEvent) => {
-      e.preventDefault();
       if (fromNav(e)) return;
+      e.preventDefault();
       const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
       const abs = Math.abs(d);
       clearTimeout(timer);
@@ -54,7 +54,7 @@ export function useShelfWheel() {
 
 export { SWIPE_MIN_PX };
 
-/** Events aimed at the site nav shouldn't also move the shelf. */
+/** Events aimed at the site nav or the chat shouldn't also move the shelf. */
 function fromNav(e: Event) {
-  return e.target instanceof Element && !!e.target.closest('[data-nav]');
+  return e.target instanceof Element && !!e.target.closest('[data-nav], [data-chat], input, textarea');
 }

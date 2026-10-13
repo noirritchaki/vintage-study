@@ -1,7 +1,6 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import retro from '../RetroButton.module.css';
 import styles from './BrewPage.module.css';
@@ -18,7 +17,7 @@ export function BrewPage() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setView('overview');
+      if (e.key === 'Escape' && !(e.target as HTMLElement)?.closest?.('[data-chat]')) setView('overview');
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -34,9 +33,6 @@ export function BrewPage() {
         warming up the kettle…
       </p>
 
-      <Link href="/" className={`${retro.button} ${styles.back}`} aria-label="Back home">
-        ⏏<span className={styles.backLabel}> back</span>
-      </Link>
 
       <BrewTitle hidden={view === 'brew'} />
       {view === 'brew' && <BrewGuide />}

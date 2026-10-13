@@ -1,5 +1,4 @@
 import { Caveat } from 'next/font/google';
-import { BrewButton } from '@/components/BrewButton';
 import { Deck } from '@/components/Deck';
 
 // Hand-writing for the cassette labels (drawn into a canvas texture).
@@ -9,7 +8,6 @@ export default function Home() {
   return (
     <main className={caveat.variable}>
       <Deck labelFont={caveat.style.fontFamily} />
-      <BrewButton />
     </main>
   );
 }

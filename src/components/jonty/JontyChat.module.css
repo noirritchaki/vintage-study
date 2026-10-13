@@ -1,0 +1,296 @@
+/* Launcher: just the sparkle, top-right, in the site's magenta (the colour
+   of "product designer"). Its name slides out to the left on hover. */
+.launcher {
+  position: fixed;
+  top: 19px;
+  right: 22px;
+  z-index: 55;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #ce0e9b;
+  cursor: pointer;
+}
+
+.launcher svg {
+  display: block;
+  transition: transform 0.3s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+.launcher:hover svg {
+  transform: rotate(-12deg) scale(1.1);
+}
+
+.launcher[data-open] {
+  /* the panel has its own close button */
+  visibility: hidden;
+}
+
+.launcher:focus-visible {
+  outline: 2px dotted #1f1f22;
+  outline-offset: 4px;
+}
+
+.launcherLabel {
+  display: grid;
+  grid-template-columns: 0fr;
+  transition: grid-template-columns 0.25s ease;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 14px;
+  letter-spacing: -0.3px;
+  color: #1f1f22;
+}
+
+.launcherLabel > span {
+  overflow: hidden;
+  white-space: nowrap;
+  padding-right: 0;
+  transition: padding-right 0.25s ease;
+}
+
+.launcher:hover .launcherLabel,
+.launcher:focus-visible .launcherLabel {
+  grid-template-columns: 1fr;
+}
+
+.launcher:hover .launcherLabel > span,
+.launcher:focus-visible .launcherLabel > span {
+  padding-right: 6px;
+}
+
+/* Panel, after RacheLLM: a faint grey sheet over the page, empty state
+   sitting at the bottom with a serif greeting, flat white composer. */
+.panel {
+  --ink: #1f1f22;
+  --ink-2: #4a4a4f;
+  --ink-3: #8a8a8f;
+  --hair: rgba(31, 31, 34, 0.06);
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  width: min(384px, 100vw);
+  /* paper grain: greyscale fractal noise tiled over the warm grey */
+  background-color: #f9f9f7;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  background-size: 220px 220px;
+  border-left: 1px solid var(--hair);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  color: var(--ink);
+  transform: translateX(100%);
+  visibility: hidden;
+  transition:
+    transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1),
+    visibility 0s linear 0.35s;
+}
+
+.panel[data-open] {
+  transform: none;
+  visibility: visible;
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 26px 16px 0 24px;
+}
+
+.title {
+  font-size: 15px;
+  letter-spacing: -0.3px;
+  color: var(--ink);
+}
+
+.actions {
+  display: flex;
+  gap: 4px;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.icon:hover {
+  color: #ce0e9b;
+}
+
+.icon:focus-visible,
+.starters button:focus-visible,
+.composer button:focus-visible {
+  outline: 2px dotted var(--ink);
+  outline-offset: 2px;
+}
+
+.log {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 16px 24px 24px;
+  font-size: 15px;
+  line-height: 1.5;
+  letter-spacing: -0.3px;
+}
+
+/* empty state sits at the bottom, just above the composer */
+.intro {
+  margin-top: auto;
+}
+
+.greeting {
+  margin: 0 0 14px;
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: -0.4px;
+  color: var(--ink);
+}
+
+.starters {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.starters button {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 0;
+  border: 0;
+  background: none;
+  color: var(--ink-2);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.starters button span {
+  color: var(--ink-3);
+}
+
+.starters button:hover {
+  color: #ce0e9b;
+}
+
+.user {
+  width: fit-content;
+  max-width: 85%;
+  margin: 16px 0 16px auto;
+  padding: 9px 13px;
+  background: #fff;
+  border: 1px solid var(--hair);
+  white-space: pre-wrap;
+}
+
+.assistant {
+  margin: 0 0 16px;
+  color: var(--ink);
+  white-space: pre-wrap;
+}
+
+.user:first-child {
+  margin-top: auto;
+}
+
+/* three-dot "thinking" */
+.typing {
+  display: inline-block;
+  width: 24px;
+  height: 8px;
+  background:
+    radial-gradient(circle, var(--ink-3) 2.5px, transparent 3px) 0 50% / 8px 8px no-repeat,
+    radial-gradient(circle, var(--ink-3) 2.5px, transparent 3px) 8px 50% / 8px 8px no-repeat,
+    radial-gradient(circle, var(--ink-3) 2.5px, transparent 3px) 16px 50% / 8px 8px no-repeat;
+  animation: typing 1s ease-in-out infinite;
+}
+
+@keyframes typing {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  margin: 0 16px 16px;
+  padding: 6px 6px 6px 10px;
+  background: #fff;
+  border: 1px solid var(--hair);
+}
+
+.composer textarea {
+  flex: 1;
+  max-height: 120px;
+  padding: 6px 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 15px;
+  line-height: 20px;
+  letter-spacing: -0.3px;
+  resize: none;
+  field-sizing: content;
+  outline: none;
+}
+
+.composer textarea::placeholder {
+  color: var(--ink-3);
+}
+
+.composer button {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.composer button:disabled {
+  color: #c4c4c6;
+  cursor: default;
+}
+
+/* Phones: the sparkle stays top-right, beside the nav; the panel goes full screen. */
+@media (max-width: 720px) {
+  .launcher {
+    top: 17px;
+    right: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel,
+  .panel[data-open],
+  .launcherLabel,
+  .launcherLabel > span,
+  .launcher svg {
+    transition: none;
+  }
+}

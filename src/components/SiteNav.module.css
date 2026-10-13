@@ -1,0 +1,125 @@
+/* Plain-text nav: the current page in light grey, top-left. The other pages
+   reveal downwards on hover, one after another. Grey → magenta on hover. */
+
+.nav {
+  position: fixed;
+  top: 20px;
+  left: 24px;
+  z-index: 50;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 20px;
+  letter-spacing: -0.3px;
+}
+
+.current {
+  position: relative;
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #a3a3a8;
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.nav[data-open] .current,
+.current:hover {
+  color: #ce0e9b;
+}
+
+.current:focus-visible,
+.item:focus-visible {
+  outline: 2px dotted #1f1f22;
+  outline-offset: 3px;
+}
+
+/* the "you are here" marker, hanging just left of the current page */
+.current::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -12px;
+  width: 5px;
+  height: 5px;
+  margin-top: -2px;
+  background: #ce0e9b;
+}
+
+/* the new page's name eases up into place */
+.swap {
+  display: inline-block;
+  animation: swapIn 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes swapIn {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+    filter: blur(2px);
+  }
+}
+
+.menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin: 0;
+  /* the padding keeps the hover alive while moving down to the list */
+  padding: 4px 24px 8px 0;
+  list-style: none;
+  pointer-events: none;
+}
+
+.nav[data-open] .menu {
+  pointer-events: auto;
+}
+
+.menu li {
+  opacity: 0;
+  transform: translateY(-4px);
+  transition:
+    opacity 0.18s ease,
+    transform 0.22s ease;
+  transition-delay: 0s;
+}
+
+.nav[data-open] .menu li {
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(var(--i) * 45ms);
+}
+
+.item {
+  display: block;
+  padding: 1px 0;
+  color: #a3a3a8;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+}
+
+.item:hover {
+  color: #ce0e9b;
+}
+
+@media (max-width: 720px) {
+  .nav {
+    top: 18px;
+    left: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .swap {
+    animation: none;
+  }
+
+  .menu li,
+  .nav[data-open] .menu li {
+    transition: opacity 0.1s linear;
+    transform: none;
+  }
+}
