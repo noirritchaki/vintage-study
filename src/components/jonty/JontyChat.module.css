@@ -578,3 +578,9 @@
     transition: none;
   }
 }
+
+/* on the brew page's blue strip the launcher goes white */
+:global(html[data-surface="blue"]) .launcher,
+:global(html[data-surface="blue"]) .launcherLabel {
+  color: #fff;
+}

@@ -7,6 +7,8 @@ import { caseStudies, outline, type Block, type CaseStudy, type Figure, type Sol
 import styles from '@/components/TapePage.module.css';
 import { CaseStudyToc, type TocItem } from '@/components/CaseStudyToc';
 import { SolutionVideo } from '@/components/SolutionVideo';
+import { StoryPage } from '@/components/story/StoryPage';
+import { stories } from '@/data/stories';
 
 export function generateStaticParams() {
   return workTapes.map((t) => ({ slug: t.slug }));
@@ -19,7 +21,7 @@ export async function generateMetadata({ params }: PageProps<'/work/[slug]'>): P
   const tape = workTapes.find((t) => t.slug === slug);
   return {
     title: tape ? `${tape.title} · noirrit chaki` : 'noirrit chaki',
-    description: caseStudies[slug]?.lead ?? tape?.summary,
+    description: stories[slug]?.summary ?? caseStudies[slug]?.lead ?? tape?.summary,
   };
 }
 
@@ -51,6 +53,9 @@ export default async function CaseStudyPage({ params }: PageProps<'/work/[slug]'
   const { slug } = await params;
   const tape = workTapes.find((t) => t.slug === slug);
   if (!tape) notFound();
+  // case studies written as a story get the story layout
+  const story = stories[slug];
+  if (story) return <StoryPage slug={slug} story={story} />;
   const study = caseStudies[slug];
 
   return (

@@ -192,3 +192,17 @@
     opacity: 1;
   }
 }
+
+/* on the brew page's blue strip */
+:global(html[data-surface='blue']) .weather {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+:global(html[data-surface='blue']) .accent,
+:global(html[data-surface='blue']) .twinkle {
+  stroke: #fff;
+}
+
+:global(html[data-surface='blue']) .fill {
+  fill: #2a52d1;
+}

@@ -1,0 +1,426 @@
+/* The brew page, in the illustration kit's look: cobalt line art on a white
+   panel inside a blue frame, everything set in DM Mono. */
+
+.page {
+  --blue: #2a52d1;
+  --blue-soft: rgba(42, 82, 209, 0.35);
+  position: fixed;
+  inset: 0;
+  padding: 56px 16px 16px; /* the blue strip on top holds the site nav */
+  background: var(--blue);
+  font-family: var(--font-dm-mono), ui-monospace, monospace;
+  color: var(--blue);
+}
+
+.panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #fff;
+}
+
+/* ---- the heads-up bits: step badge, title, status pill ---- */
+
+.hud {
+  position: absolute;
+  top: 28px;
+  left: 28px;
+  right: 28px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  pointer-events: none;
+}
+
+.badge {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border: 2px solid var(--blue);
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.title {
+  position: absolute;
+  left: 50%;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.pill {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 10px 18px;
+  border: 1px solid var(--blue-soft);
+  font-size: 13px;
+  letter-spacing: 1.6px;
+  white-space: nowrap;
+}
+
+.dots {
+  display: inline-flex;
+  gap: 4px;
+  margin-left: 2px;
+}
+
+.dots i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  border: 1px solid var(--blue);
+}
+
+.dots i[data-on] {
+  background: var(--blue);
+}
+
+/* ---- the illustrated stage ---- */
+
+.stageArea {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px 12px;
+  container-type: size;
+}
+
+.scene {
+  position: relative;
+  width: min(100cqw, 100cqh * 1100 / 1040);
+  aspect-ratio: 1100 / 1040;
+  container-type: inline-size;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.art,
+.piece {
+  position: absolute;
+  display: block;
+  transition: opacity 0.45s ease;
+}
+
+.piece > .art {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+img.art {
+  pointer-events: none;
+}
+
+.fill {
+  transition:
+    clip-path 0.25s linear,
+    opacity 0.45s ease;
+}
+
+.fade {
+  transition: opacity 0.6s ease;
+}
+
+/* the dripper's states and the mug crossfade quickly */
+.dripper > .art,
+.mug > .art {
+  transition: opacity 0.3s ease;
+}
+
+/* the server empties into the mug slowly when you serve */
+.scene[data-stage='serving'] .server .fill {
+  transition: clip-path 1.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scene[data-stage='serving'] .mugFill {
+  transition: opacity 1.6s ease 0.3s;
+}
+
+/* scale display: live time and weight in the kit's white mono */
+.display {
+  position: absolute;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 0.55cqw;
+  color: #fff;
+  font-size: 0.95cqw;
+  font-weight: 500;
+  letter-spacing: 0.05cqw;
+  pointer-events: none;
+}
+
+/* the kettle tips into a pour, and stands back upright when you let go */
+.kettlePour {
+  transform-origin: 62% 55%;
+  transition:
+    opacity 0.5s ease,
+    transform 0.45s cubic-bezier(0.3, 0.7, 0.3, 1);
+}
+
+.scene[data-pouring] .kettlePour {
+  transition:
+    opacity 0.5s ease,
+    transform 0.3s cubic-bezier(0.3, 0.7, 0.3, 1);
+}
+
+/* flip-book frames: stream and steam cycle through their three drawings */
+.frames > .art {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  animation: frame var(--frame-speed, 0.36s) steps(1) infinite;
+}
+
+.frames > .art:nth-child(2) {
+  animation-delay: calc(var(--frame-speed, 0.36s) / -3);
+}
+
+.frames > .art:nth-child(3) {
+  animation-delay: calc(var(--frame-speed, 0.36s) / -1.5);
+}
+
+@keyframes frame {
+  0% {
+    opacity: 1;
+  }
+  33.33%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.stream {
+  transition: opacity 0.15s ease;
+}
+
+.steam {
+  --frame-speed: 1.2s;
+  transition: opacity 1s ease 1s;
+}
+
+/* coffee dripping into the server */
+.drips {
+  transition: opacity 0.3s ease;
+  animation: drip 0.9s ease-in infinite;
+}
+
+@keyframes drip {
+  from {
+    transform: translateY(-12%);
+  }
+  to {
+    transform: translateY(28%);
+  }
+}
+
+.splash {
+  transition:
+    opacity 0.3s ease,
+    top 0.25s linear;
+}
+
+/* white line art, for marks drawn on top of the coffee */
+.onCoffee {
+  filter: brightness(0) invert(1);
+}
+
+/* the grinder rattles while you hold it */
+.scene[data-grinding] .grinder {
+  animation: rattle 0.12s linear infinite;
+  transform-origin: 50% 90%;
+}
+
+@keyframes rattle {
+  0%,
+  100% {
+    transform: rotate(-1deg);
+  }
+  50% {
+    transform: rotate(1.2deg);
+  }
+}
+
+/* ---- what you can touch ---- */
+
+.hit {
+  position: absolute;
+  z-index: 2;
+  padding: 0;
+  border: 0;
+  border-radius: 24px;
+  background: transparent;
+  cursor: pointer;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hit:focus-visible {
+  outline: 2px dashed var(--blue);
+  outline-offset: 4px;
+}
+
+/* the thing to touch next lifts a little on hover */
+.scene:has(.hit:hover) :is(.grinder, .dripper, .server) {
+  transition: translate 0.2s ease;
+}
+
+.scene[data-stage='grind']:has(.hit:hover) .grinder,
+.scene:is([data-stage='filter'], [data-stage='grounds'], [data-stage='pour']):has(.hit:hover) .dripper,
+.scene[data-stage='serve']:has(.hit:hover) .server {
+  translate: 0 -0.6cqw;
+}
+
+/* ---- the caption box: what to do now ---- */
+
+.caption {
+  position: absolute;
+  top: 120px;
+  left: 40px;
+  z-index: 3;
+  width: 290px;
+  padding: 18px 22px;
+  background: var(--blue);
+  color: #fff;
+}
+
+.caption:empty {
+  display: none;
+}
+
+.headline {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.4;
+}
+
+.detail {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  opacity: 0.8;
+}
+
+.recipe {
+  margin: 14px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  font-size: 11px;
+  letter-spacing: 1px;
+  opacity: 0.65;
+}
+
+.again {
+  margin-top: 16px;
+  padding: 8px 16px;
+  border: 1px solid #fff;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.again:hover {
+  background: #fff;
+  color: var(--blue);
+}
+
+.again:focus-visible {
+  outline: 2px dashed #fff;
+  outline-offset: 3px;
+}
+
+/* ---- phones and narrow windows: the hud and caption join the flow ---- */
+
+@media (max-width: 900px) {
+  .page {
+    position: static;
+    min-height: 100svh;
+    padding: 52px 10px 10px;
+  }
+
+  .panel {
+    height: auto;
+    min-height: calc(100svh - 62px);
+  }
+
+  .hud {
+    position: static;
+    padding: 16px 16px 0;
+  }
+
+  .title {
+    display: none;
+  }
+
+  .badge {
+    width: 38px;
+    height: 38px;
+    font-size: 14px;
+  }
+
+  .pill {
+    gap: 8px;
+    padding: 8px 12px;
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+
+  .dots {
+    display: none;
+  }
+
+  .stageArea {
+    flex: none;
+    height: min(calc(100vw - 20px) * 1040 / 1100, 62svh);
+    padding: 8px;
+  }
+
+  .caption {
+    position: static;
+    width: auto;
+    margin: 0 12px 12px;
+  }
+
+  .headline {
+    font-size: 17px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .frames > .art {
+    animation: none;
+  }
+
+  .frames > .art:first-child {
+    opacity: 1;
+  }
+
+  .drips,
+  .scene[data-grinding] .grinder {
+    animation: none;
+  }
+}

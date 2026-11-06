@@ -47,3 +47,19 @@ body {
   background: rgba(206, 14, 155, 0.13);
   color: #ce0e9b;
 }
+
+/* the brew page's blue, behind everything (so overscroll stays blue too) */
+html[data-surface='blue'],
+html[data-surface='blue'] body {
+  background: #2a52d1;
+}
+
+/* visually hidden, still read by screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

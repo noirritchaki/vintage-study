@@ -1,4 +1,3 @@
-import { Vector3 } from 'three';
 import { create } from 'zustand';
 
 // ---------------------------------------------------------------- recipe ---
@@ -29,11 +28,6 @@ export const STEPS: Step[] = [
   { kind: 'drawdown', start: 120, end: null, target: 250, title: 'Let it drain' },
 ];
 
-export function stepAt(t: number) {
-  const i = STEPS.findIndex((s) => s.end === null || t < s.end);
-  return i === -1 ? STEPS.length - 1 : i;
-}
-
 export const formatTime = (t: number) => {
   const s = Math.max(0, Math.floor(t));
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
@@ -49,8 +43,8 @@ const RETAINED = DOSE * 2;
 export type Status = 'ready' | 'brewing' | 'done';
 
 /**
- * Mutable brew state, advanced every frame by `advance()` and read by the 3D
- * scene directly (no React renders). The UI gets a throttled snapshot.
+ * Mutable brew state, advanced every frame by `advance()`. The page reads a
+ * throttled snapshot of it (see useBrewUI) to draw the scale, server and dripper.
  */
 export const sim = {
   status: 'ready' as Status,
@@ -58,7 +52,7 @@ export const sim = {
   pouring: false,
   /** Smoothed flow, g/s. */
   flow: 0,
-  /** Everything poured so far — what the scale reads. */
+  /** Everything poured so far: what the scale reads. */
   poured: 0,
   /** Soaked into the grounds. */
   absorbed: 0,
@@ -70,11 +64,18 @@ export const sim = {
   drainRate: 0,
   /** 0..1, the foamy CO₂ dome during the bloom. */
   bloom: 0,
-  /** Where the stream lands, in world space. */
-  landing: new Vector3(),
   /** Scale reading at the end of each step (index → grams). */
   stepWeights: [] as (number | undefined)[],
+  /** The recipe step we're on (index into STEPS). */
+  step: 0,
+  /** Brew time when that step began. */
+  stepStart: 0,
 };
+
+/** Within this many grams of a target counts as reaching it. */
+const NEAR = 2;
+/** The one test for "this pour is done": the guide's "stop" and the step moving on both use it. */
+const nearTarget = (poured: number, target: number) => target - poured <= NEAR;
 
 export function resetSim() {
   Object.assign(sim, {
@@ -89,6 +90,8 @@ export function resetSim() {
     drainRate: 0,
     bloom: 0,
     stepWeights: [],
+    step: 0,
+    stepStart: 0,
   });
   useBrewUI.getState().publish();
 }
@@ -118,13 +121,23 @@ export function advance(dt: number) {
   if (sim.poured > 0 && sim.t < 50) sim.bloom = Math.min(1, sim.bloom + (added / 30) * 1.5);
   else sim.bloom = Math.max(0, sim.bloom - dt * 0.08);
 
+  // Move through the recipe. Pours end when you reach the target and let go,
+  // however long that takes; the waits are timed (the bloom runs to its end
+  // time, and each pause counts from when the pour before it finished).
   if (sim.status === 'brewing') {
-    STEPS.forEach((s, i) => {
-      if (s.end !== null && sim.t >= s.end && sim.stepWeights[i] === undefined) sim.stepWeights[i] = sim.poured;
-    });
-    if (sim.t > 120 && sim.free < 0.6) {
+    const s = STEPS[sim.step];
+    const reached = !sim.pouring && nearTarget(sim.poured, s.target);
+    const next = () => {
+      sim.stepWeights[sim.step] = sim.poured;
+      sim.step += 1;
+      sim.stepStart = sim.t;
+    };
+    if (s.kind === 'bloom' && reached && sim.t >= (s.end ?? 0)) next();
+    else if (s.kind === 'pour' && reached) next();
+    else if (s.kind === 'pause' && sim.t - sim.stepStart >= (s.end ?? s.start) - s.start) next();
+    else if (s.kind === 'drawdown' && !sim.pouring && sim.free < 0.6) {
+      sim.stepWeights[sim.step] = sim.poured;
       sim.status = 'done';
-      sim.stepWeights[STEPS.length - 1] = sim.poured;
     }
   }
 }
@@ -135,33 +148,42 @@ export type Guidance = { headline: string; detail: string; tone: 'go' | 'wait' |
 
 export function guidance(s: typeof sim): Guidance {
   if (s.status === 'ready') {
-    return { headline: 'Pour 50g to bloom', detail: 'Press and hold on the coffee bed to pour', tone: 'go' };
+    return { headline: 'pour 50g to bloom', detail: 'press and hold the dripper to pour', tone: 'go' };
   }
-  if (s.status === 'done') return { headline: 'Enjoy your coffee', detail: 'Drawdown complete', tone: 'done' };
+  if (s.status === 'done') return { headline: 'all drained', detail: 'tap the server to pour your cup', tone: 'done' };
 
-  const i = stepAt(s.t);
+  const i = s.step;
   const step = STEPS[i];
-  const left = step.end === null ? 0 : Math.ceil(step.end - s.t);
-  const toGo = Math.round(step.target - s.poured);
+  const toGo = Math.ceil(step.target - s.poured);
+  // seconds left of a wait: the bloom runs to its end time, a pause for its length
+  const left = Math.max(
+    0,
+    Math.ceil(
+      step.kind === 'pause'
+        ? (step.end ?? step.start) - step.start - (s.t - s.stepStart)
+        : (step.end ?? s.t) - s.t,
+    ),
+  );
 
   if (step.kind === 'drawdown') {
-    return { headline: 'Let it drain', detail: 'Almost there — the last of it is dripping through', tone: 'wait' };
+    return { headline: 'let it drain', detail: 'almost there, the last of it is dripping through', tone: 'wait' };
   }
-  if (step.kind === 'pause' || (step.kind === 'bloom' && s.poured >= step.target - 2)) {
+  const blooming = step.kind === 'bloom' && nearTarget(s.poured, step.target) && !s.pouring;
+  if (step.kind === 'pause' || blooming) {
     const next = STEPS[i + 1];
-    if (s.pouring) return { headline: 'Hold off for now', detail: `Next pour in ${left}s`, tone: 'warn' };
+    if (s.pouring) return { headline: 'hold off for now', detail: `next pour in ${left}s`, tone: 'warn' };
     return {
-      headline: step.kind === 'bloom' ? 'Let it bloom' : 'Pause',
-      detail: next ? `${next.title.replace('Pour up to', 'Pour to')} in ${left}s` : `${left}s`,
+      headline: step.kind === 'bloom' ? 'let it bloom' : 'pause',
+      detail: next ? `${next.title.replace('Pour up to', 'pour to')} in ${left}s` : `${left}s`,
       tone: 'wait',
     };
   }
   // A pour (or the bloom pour).
-  if (toGo <= 2 && toGo >= -6) return { headline: `${step.target}g — stop`, detail: 'Spot on. Let it settle', tone: 'done' };
-  if (toGo < -6) return { headline: 'A little over', detail: 'No stress — ease off the next pour', tone: 'warn' };
+  if (nearTarget(s.poured, step.target) && toGo >= -6) return { headline: `${step.target}g, stop`, detail: 'spot on, let it settle', tone: 'done' };
+  if (toGo < -6) return { headline: 'a little over', detail: 'no stress, ease off the next pour', tone: 'warn' };
   return {
-    headline: step.kind === 'bloom' ? 'Pour 50g to bloom' : `Pour to ${step.target}g`,
-    detail: `${toGo}g to go · ${left}s left`,
+    headline: step.kind === 'bloom' ? 'pour 50g to bloom' : `pour to ${step.target}g`,
+    detail: `${toGo}g to go`,
     tone: 'go',
   };
 }
@@ -171,7 +193,7 @@ export function verdict() {
   const pours = STEPS.map((s, i) => ({ s, w: sim.stepWeights[i] })).filter(({ s }) => s.kind === 'bloom' || s.kind === 'pour');
   const misses = pours.map(({ s, w }) => Math.abs((w ?? sim.poured) - s.target));
   const avg = misses.reduce((a, b) => a + b, 0) / Math.max(1, misses.length);
-  const title = avg < 6 ? 'Barista-level' : avg < 14 ? 'Lovely cup' : avg < 30 ? 'Not bad at all' : 'An experimental brew';
+  const title = avg < 6 ? 'barista-level' : avg < 14 ? 'lovely cup' : avg < 30 ? 'not bad at all' : 'an experimental brew';
   return {
     title,
     time: formatTime(sim.t),
@@ -190,6 +212,14 @@ type Snapshot = {
   weight: number;
   step: number;
   pouring: boolean;
+  /** Coffee in the server, g. */
+  drained: number;
+  /** Water standing on the bed, g. */
+  free: number;
+  /** 0..1 bloom foam. */
+  bloom: number;
+  /** Drip rate into the server, g/s. */
+  drainRate: number;
   guide: Guidance;
   publish: () => void;
 };
@@ -201,14 +231,22 @@ export const useBrewUI = create<Snapshot>((set) => ({
   weight: 0,
   step: 0,
   pouring: false,
+  drained: 0,
+  free: 0,
+  bloom: 0,
+  drainRate: 0,
   guide: guidance(sim),
   publish: () =>
     set({
       status: sim.status,
       t: sim.t,
       weight: sim.poured,
-      step: sim.status === 'ready' ? 0 : stepAt(sim.t),
+      step: sim.step,
       pouring: sim.pouring,
+      drained: sim.drained,
+      free: sim.free,
+      bloom: sim.bloom,
+      drainRate: sim.drainRate,
       guide: guidance(sim),
     }),
 }));

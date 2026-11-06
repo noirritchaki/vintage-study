@@ -5,6 +5,7 @@
 import { profile } from './profile';
 import { aboutText, photoGroups, timeline } from './about';
 import { caseStudies, outline } from './caseStudies';
+import { stories, type StoryBlock } from './stories';
 import { tapes } from './tapes';
 import { DOSE, STEPS, TOTAL } from '@/components/brew/brewSim';
 
@@ -49,6 +50,52 @@ function recipeText() {
     s.end === null ? `- then ${s.title.toLowerCase()}` : `- ${s.start}s to ${s.end}s: ${s.title.toLowerCase()}`,
   ).join('\n');
   return `## My pour-over recipe (the one on the brew a coffee page)\n${DOSE}g coffee to ${TOTAL}g water (about 1:${Math.round(TOTAL / DOSE)}), done in about two and a half minutes:\n${steps}`;
+}
+
+function storyBlockText(b: StoryBlock): string {
+  switch (b.type) {
+    case 'text':
+      return b.text;
+    case 'statement':
+      return `${b.label}: ${b.text}`;
+    case 'cards':
+      return b.cards.map((c) => `- ${c.title}: ${c.text}`).join('\n');
+    case 'options':
+      return b.options
+        .map((o) => `- Option "${o.title}". Pros: ${o.pros.join('; ')}. Cons: ${o.cons.join('; ')}.`)
+        .join('\n');
+    case 'finalPick':
+      return `Final pick: ${b.title} (${b.pros.join('; ')})`;
+    case 'list':
+      return b.items.map((i) => `- ${i.lead ? i.lead + ' ' : ''}${i.text}`).join('\n');
+    case 'table':
+      return [b.columns.join(' | '), ...b.rows.map((r) => r.join(' | '))].join('\n');
+    case 'flows':
+      return b.flows.map((f) => `- ${f.title}: ${f.text}`).join('\n');
+    case 'learnings':
+      return b.items.map((l) => `- ${l.title}: ${l.text}`).join('\n');
+    case 'quote':
+      return `A user said: "${b.text}" (${b.cite})`;
+    case 'scale':
+      return `${b.title}: ${b.levels.map((l) => `${l.label} (${{ good: 'green', warn: 'yellow', bad: 'red' }[l.tone]}): ${l.meaning}`).join('; ')}`;
+    case 'figure':
+      return '';
+  }
+}
+
+/** Case studies written in the story layout (stories.ts). */
+function storyText() {
+  return Object.entries(stories)
+    .map(([slug, st]) =>
+      [
+        `## Case study: ${st.title}`,
+        `Page: /work/${slug}. Role: ${st.meta.role}. Team: ${st.meta.team.join(', ')}. Timeline: ${st.meta.timeline.join(' ')}. Skills: ${st.meta.skills.join(', ')}.`,
+        st.summary,
+        `Impact:\n${st.impact.map((i) => `- ${i.value}: ${i.label}`).join('\n')}`,
+        ...st.sections.map((sec) => `### ${sec.label}: ${sec.heading}\n${sec.blocks.map(storyBlockText).filter(Boolean).join('\n')}`),
+      ].join('\n\n'),
+    )
+    .join('\n\n');
 }
 
 function caseStudyText() {
@@ -110,7 +157,7 @@ export function buildKnowledge() {
     })
     .join('\n');
   const otherWork = tapes
-    .filter((t) => t.kind === 'work' && !caseStudies[t.slug])
+    .filter((t) => t.kind === 'work' && !caseStudies[t.slug] && !stories[t.slug])
     .map((t) => t.title)
     .join(', ');
 
@@ -122,6 +169,7 @@ export function buildKnowledge() {
     recipeText(),
     `## Things I love outside work\nEach with the captions from my photos on the about page (short and playful; this is everything I've written about them so far).\n${hobbies}`,
     caseStudyText(),
+    storyText(),
     otherWork ? `## Other work on the site\nStill being written up: ${otherWork}. Don't describe them.` : '',
     `## The site itself\nA portfolio built like a shelf of cassettes: drag a tape into the Walkman to open a case study. Pages: home, about, what i like doing (hobbies), vintage stuff i own (my vintage pieces floating around the page, with a note on each), projects, and "brew a coffee" (an interactive pour-over).`,
     extras,

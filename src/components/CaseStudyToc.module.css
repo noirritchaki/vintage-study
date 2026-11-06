@@ -1,22 +1,22 @@
-/* Case study chapters, pinned to the left like the site nav: light grey text,
-   the section being read in magenta with the nav's square marker beside it.
-   Only on screens wide enough to fit it beside the page. */
+/* Case study timeline, after elaineyu.design: pinned to the far left of the
+   window, a thin line with a dot per section. The current section's dot fills
+   and its name shows; hovering the timeline reveals every name. Wide screens
+   only, so it never sits on top of the content. */
 
-.toc {
+.timeline {
+  --ink: #242424;
+  --soft: rgba(36, 36, 36, 0.28);
+  /* between dots: roomy, but always fits the window's height */
+  --gap: clamp(12px, calc((100vh - 150px) / var(--count, 8) - 12px), 22px);
   position: fixed;
-  top: 50%;
-  left: 24px;
+  top: 96px;
+  left: 28px;
   z-index: 40;
   display: none;
-  width: 184px;
-  max-height: calc(100vh - 160px);
-  overflow-y: auto;
-  transform: translateY(-50%);
-  font-family: var(--font-inter), system-ui, sans-serif;
-  font-size: 13px;
-  line-height: 1.35;
-  letter-spacing: -0.2px;
-  scrollbar-width: none;
+  font-family: var(--font-code, var(--font-inter)), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
   animation: tocIn 0.6s ease 0.2s both;
 }
 
@@ -26,92 +26,126 @@
   }
 }
 
-@media (min-width: 1320px) {
-  .toc {
+@media (min-width: 1360px) {
+  .timeline {
     display: block;
   }
 }
 
-/* when the chat panel pushes the page aside, there's no room beside it */
-:global(html[data-chat-open]) .toc {
+/* when the chat panel pushes the page aside, there's no room for it */
+:global(html[data-chat-open]) .timeline {
   display: none;
 }
 
-.toc ul {
+.timeline ol {
+  position: relative;
+  display: grid;
+  gap: var(--gap);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.link {
-  position: relative;
-  display: block;
-  padding: 4px 0 4px 12px;
-  color: #a3a3a8;
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.link[data-inside] {
-  color: #6b6b70;
-}
-
-.link:hover {
-  color: #1f1f22;
-}
-
-.link[data-active] {
-  color: #ce0e9b;
-}
-
-/* the nav's "you are here" square */
-.link[data-active]::before {
+/* the line, and a darker fill up to the current section */
+.timeline ol::before,
+.timeline ol::after {
   content: '';
   position: absolute;
-  top: calc(4px + 0.675em);
-  left: 0;
-  width: 5px;
-  height: 5px;
-  margin-top: -2.5px;
-  background: #ce0e9b;
+  top: 6px;
+  left: 5px;
+  width: 1px;
+  bottom: 6px;
+  background: var(--soft);
 }
 
-.link:focus-visible {
-  outline: 2px dotted #1f1f22;
-  outline-offset: 2px;
+.timeline ol::after {
+  bottom: auto;
+  height: calc((100% - 12px) * var(--progress));
+  background: var(--ink);
+  transition: height 0.4s ease;
 }
 
-/* a chapter's sections open underneath while you're in it */
-.sub {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.35s ease;
+.stop {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 12px;
+  color: var(--ink);
+  text-decoration: none;
 }
 
-.sub > li {
-  min-height: 0;
+.dot {
+  flex: none;
+  width: 11px;
+  height: 11px;
+  border: 1px solid var(--soft);
+  border-radius: 50%;
+  background: var(--page-bg, #fff);
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.stop[data-past] .dot {
+  border-color: var(--ink);
+}
+
+.stop[data-active] .dot {
+  border-color: var(--ink);
+  background: var(--ink);
+  transform: scale(1.15);
+}
+
+.stop:hover .dot {
+  border-color: var(--ink);
+}
+
+/* names: only the current one, until you hover the timeline */
+.label {
+  max-width: 160px; /* stays clear of the content column */
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
-.sub[data-open] {
-  grid-template-rows: 1fr;
+.stop[data-active] .label,
+.timeline:hover .label,
+.timeline:focus-within .label {
+  opacity: 1;
+  transform: none;
 }
 
-.sub .link {
-  padding-left: 24px;
-  font-size: 12px;
+.timeline:hover .stop:not([data-active]) .label {
+  color: #666;
 }
 
-.sub .link[data-active]::before {
-  left: 12px;
+.stop:hover .label {
+  color: var(--ink) !important;
+}
+
+.stop:focus-visible {
+  outline: none;
+}
+
+.stop:focus-visible .dot {
+  outline: 2px dotted var(--ink);
+  outline-offset: 3px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .toc {
+  .timeline,
+  .timeline ol::after,
+  .dot,
+  .label {
     animation: none;
-  }
-
-  .sub {
     transition: none;
   }
 }

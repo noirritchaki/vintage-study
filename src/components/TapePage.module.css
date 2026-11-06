@@ -357,6 +357,7 @@
 }
 
 .solutionItem:hover .videoControls,
+.videoWrap:hover .videoControls,
 .videoControls:focus-within {
   opacity: 1;
 }

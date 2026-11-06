@@ -3,6 +3,7 @@
 // from tapes.ts (set `thumbnail` on a tape to change its card); the rest are here.
 
 import { caseStudies } from './caseStudies';
+import { stories } from './stories';
 import { hrefFor, tapes, type Thumbnail } from './tapes';
 
 export type ChatLink = {
@@ -43,7 +44,7 @@ const pageLinks: ChatLink[] = [
 ];
 
 const tapeLinks: ChatLink[] = tapes
-  .filter((t) => t.kind === 'hobbies' || caseStudies[t.slug])
+  .filter((t) => t.kind === 'hobbies' || caseStudies[t.slug] || stories[t.slug])
   .map((t) => ({
     id: t.slug,
     href: hrefFor(t),

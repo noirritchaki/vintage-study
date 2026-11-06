@@ -8,17 +8,6 @@ import styles from './SiteNav.module.css';
 import { Weather } from './Weather';
 
 /**
- * Loading the brew scene's code also starts fetching its models and textures,
- * so the brew page is usually ready by the time someone opens it.
- */
-let warmed = false;
-function warmBrew() {
-  if (warmed) return;
-  warmed = true;
-  void import('./brew/BrewScene');
-}
-
-/**
  * Site navigation as plain text: the current page's name, top-left. Hover (or
  * focus, or tap) reveals the other pages underneath; picking one navigates and
  * the label swaps to the new page.
@@ -33,14 +22,6 @@ export function SiteNav() {
   const lastPointer = useRef('mouse');
   const listId = useId();
   const hidden = pathname.startsWith('/work'); // case studies are for reading
-
-  // Quietly pre-load the brew page's 3D scene once this page has settled.
-  useEffect(() => {
-    if (pathname === '/brew') return;
-    const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 1));
-    const t = window.setTimeout(() => idle(warmBrew, { timeout: 4000 }), 2500);
-    return () => window.clearTimeout(t);
-  }, [pathname]);
 
   // Tap / click anywhere else closes it.
   useEffect(() => {
@@ -106,8 +87,6 @@ export function SiteNav() {
                 href={p.href}
                 className={styles.item}
                 tabIndex={open ? 0 : -1}
-                onPointerEnter={p.href === '/brew' ? warmBrew : undefined}
-                onFocus={p.href === '/brew' ? warmBrew : undefined}
                 onClick={() => {
                   setOpen(false);
                   label.current?.blur();

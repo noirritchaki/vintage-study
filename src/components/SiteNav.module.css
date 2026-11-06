@@ -131,3 +131,33 @@
     transform: none;
   }
 }
+
+/* the brew page sits on its own blue, so the nav goes white there */
+:global(html[data-surface='blue']) .current,
+:global(html[data-surface='blue']) .item {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+:global(html[data-surface='blue']) .current::before {
+  background: #fff;
+}
+
+:global(html[data-surface='blue']) .nav[data-open] .current,
+:global(html[data-surface='blue']) .current:hover,
+:global(html[data-surface='blue']) .item:hover {
+  color: #fff;
+}
+
+/* the open menu drops over the brew page's white panel, so it gets a blue card */
+:global(html[data-surface='blue']) .menu {
+  margin-left: -12px;
+  padding: 6px 14px 10px 12px;
+  border-radius: 8px;
+  background: transparent;
+  transition: background 0.2s ease;
+}
+
+:global(html[data-surface='blue']) .nav[data-open] .menu {
+  background: #2a52d1;
+  box-shadow: 0 8px 24px rgba(20, 40, 120, 0.25);
+}

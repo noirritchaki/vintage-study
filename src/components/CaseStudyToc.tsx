@@ -1,28 +1,29 @@
 'use client';
 
-import { useEffect, useState, type MouseEvent } from 'react';
+import { useEffect, useState, type CSSProperties, type MouseEvent } from 'react';
 import styles from './CaseStudyToc.module.css';
 
 export type TocItem = { id: string; label: string; children?: { id: string; label: string }[] };
 
 /**
- * Chapter list pinned to the left of a case study (wide screens only). The
- * section being read is highlighted, its sub-sections open underneath, and
- * clicking any entry scrolls there.
+ * The case study's table of contents as a timeline pinned to the far left
+ * (wide screens only), after elaineyu.design: a thin line with a dot per
+ * section. The section being read gets a filled dot and its name; the line
+ * fills up to it as you scroll. Hovering the timeline shows every name, and
+ * clicking a dot scrolls there.
  */
 export function CaseStudyToc({ items }: { items: TocItem[] }) {
-  const [active, setActive] = useState(items[0]?.id);
+  const [active, setActive] = useState(0);
 
   useEffect(() => {
-    const ids = items.flatMap((i) => [i.id, ...(i.children?.map((c) => c.id) ?? [])]);
     const update = () => {
       // the last section whose top has passed a line a third of the way down
       const line = window.innerHeight / 3;
-      let current = ids[0];
-      for (const id of ids) {
-        const el = document.getElementById(id);
-        if (el && el.getBoundingClientRect().top <= line) current = id;
-      }
+      let current = 0;
+      items.forEach((item, i) => {
+        const el = document.getElementById(item.id);
+        if (el && el.getBoundingClientRect().top <= line) current = i;
+      });
       setActive(current);
     };
     update();
@@ -43,50 +44,27 @@ export function CaseStudyToc({ items }: { items: TocItem[] }) {
     history.replaceState(null, '', `#${id}`);
   };
 
+  const progress = items.length > 1 ? active / (items.length - 1) : 0;
+
   return (
-    <nav className={styles.toc} aria-label="Chapters">
-      <ul>
-        {items.map((item) => {
-          const inside = item.id === active || item.children?.some((c) => c.id === active);
-          return (
-            <li key={item.id}>
-              <a
-                href={`#${item.id}`}
-                onClick={(e) => go(e, item.id)}
-                className={styles.link}
-                data-active={item.id === active || undefined}
-                data-inside={inside || undefined}
-                aria-current={item.id === active ? 'location' : undefined}
-              >
-                {item.label}
-              </a>
-              {item.children?.length ? (
-                <ul className={styles.sub} data-open={inside || undefined}>
-                  <li>
-                    {/* grid row trick: animates open to its natural height */}
-                    <ul>
-                      {item.children.map((c) => (
-                        <li key={c.id}>
-                          <a
-                            href={`#${c.id}`}
-                            onClick={(e) => go(e, c.id)}
-                            className={styles.link}
-                            data-active={c.id === active || undefined}
-                            aria-current={c.id === active ? 'location' : undefined}
-                            tabIndex={inside ? undefined : -1}
-                          >
-                            {c.label}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </li>
-                </ul>
-              ) : null}
-            </li>
-          );
-        })}
-      </ul>
+    <nav className={styles.timeline} aria-label="Sections" style={{ '--progress': progress, '--count': items.length } as CSSProperties}>
+      <ol>
+        {items.map((item, i) => (
+          <li key={item.id}>
+            <a
+              href={`#${item.id}`}
+              onClick={(e) => go(e, item.id)}
+              className={styles.stop}
+              data-active={i === active || undefined}
+              data-past={i < active || undefined}
+              aria-current={i === active ? 'location' : undefined}
+            >
+              <span className={styles.dot} aria-hidden />
+              <span className={styles.label}>{item.label}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
     </nav>
   );
 }
