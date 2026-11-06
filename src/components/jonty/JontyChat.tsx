@@ -1,16 +1,61 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  useCallback,
   useEffect,
   useRef,
   useState,
+  type CSSProperties,
   type FormEvent,
   type KeyboardEvent,
 } from "react";
 import styles from "./JontyChat.module.css";
+import { RevealText } from "./RevealText";
+import { startersFor } from "@/data/chatStarters";
+import type { Thumbnail } from "@/data/tapes";
 
-type Turn = { role: "user" | "assistant"; content: string };
+/** A page the answer points to, shown as a card with its thumbnail. */
+type LinkCard = {
+  href: string;
+  title: string;
+  subtitle: string;
+  thumbnail?: Thumbnail;
+};
+
+type Turn = {
+  role: "user" | "assistant";
+  content: string;
+  /** Still arriving from the server. */
+  streaming?: boolean;
+  /** Finished revealing on screen. */
+  revealed?: boolean;
+  /** Suggested next questions, shown under the latest answer. */
+  followups?: string[];
+  /** The page the visitor was on when this was answered. */
+  page?: string;
+  /** Pages the answer is about, shown as cards under it. */
+  links?: LinkCard[];
+  /** Text the visitor highlighted on the page and asked about. */
+  quote?: string;
+};
+
+/** Longest highlighted passage sent along with a question. */
+const MAX_QUOTE = 400;
+
+/** What the server sees for a visitor turn: the question, with any quote it's about. */
+const messageFor = (t: Turn) =>
+  t.quote
+    ? `About this bit of the site: "${t.quote}"\n\n${t.content}`
+    : t.content;
+
+/** Short enough to show in one line or two. */
+const clip = (text: string, max = MAX_QUOTE) =>
+  text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text;
+
+/** Separates the answer from the follow-ups JSON in /api/chat's response. */
+const RECORD_SEPARATOR = "\u001e";
 
 const GREETINGS = [
   "Hey, ask away.",
@@ -18,22 +63,111 @@ const GREETINGS = [
   "Ask me anything.",
 ];
 
-const STARTERS = [
-  "What are you working on at Plum?",
-  "Tell me about Killing the DUR",
-  "What do you do for fun?",
-  "How do you approach design?",
-  "Where have you worked before?",
-  "Can I get in touch?",
-];
-
-/** A fresh greeting and three starter questions each time the chat opens. */
+/** A fresh greeting, and a seed that picks which page questions to show. */
 function pickIntro() {
-  const shuffled = [...STARTERS].sort(() => Math.random() - 0.5);
   return {
     greeting: GREETINGS[Math.floor(Math.random() * GREETINGS.length)],
-    starters: shuffled.slice(0, 3),
+    seed: Math.floor(Math.random() * 1e6),
   };
+}
+
+/** Three of `questions`, chosen by `seed` (the same seed always picks the same three). */
+function pickThree(questions: string[], seed: number) {
+  const score = (q: string) => {
+    let h = seed;
+    for (let i = 0; i < q.length; i++) h = (h * 31 + q.charCodeAt(i)) >>> 0;
+    return h;
+  };
+  return [...questions].sort((a, b) => score(a) - score(b)).slice(0, 3);
+}
+
+function LinkCards({
+  links,
+  onOpen,
+}: {
+  links: LinkCard[];
+  onOpen: () => void;
+}) {
+  return (
+    <ul className={styles.cards}>
+      {links.map((l, k) => (
+        <li key={l.href} style={{ "--i": k } as CSSProperties}>
+          <Link href={l.href} className={styles.card} onClick={onOpen}>
+            <span className={styles.thumb}>
+              {l.thumbnail && "video" in l.thumbnail ? (
+                <video
+                  src={l.thumbnail.video}
+                  poster={l.thumbnail.poster}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                  disablePictureInPicture
+                  aria-hidden
+                />
+              ) : l.thumbnail ? (
+                // eslint-disable-next-line @next/next/no-img-element -- small, already-optimised webp
+                <img src={l.thumbnail.src} alt="" loading="lazy" />
+              ) : null}
+            </span>
+            <span className={styles.cardText}>
+              <span className={styles.cardTitle}>{l.title}</span>
+              <span className={styles.cardSub}>{l.subtitle}</span>
+            </span>
+            <span className={styles.cardArrow} aria-hidden>
+              →
+            </span>
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/**
+ * Questions under the latest answer: the bot's own follow-ups, or, once the
+ * visitor has moved to another page, questions about that page instead.
+ */
+function Suggestions({
+  turn,
+  pathname,
+  asked,
+  onAsk,
+}: {
+  turn: Turn;
+  pathname: string;
+  asked: string[];
+  onAsk: (question: string) => void;
+}) {
+  const moved = !!turn.page && turn.page !== pathname;
+  const seen = new Set(asked.map((q) => q.trim().toLowerCase()));
+  const questions = moved
+    ? pickThree(
+        startersFor(pathname).filter((q) => !seen.has(q.toLowerCase())),
+        asked.length,
+      )
+    : (turn.followups ?? []);
+  if (!questions.length) return null;
+  return (
+    <>
+      {moved ? <p className={styles.pageNote}>about this page</p> : null}
+      {/* keyed by page, so the new questions play their entrance */}
+      <ul
+        key={moved ? pathname : "followups"}
+        className={`${styles.starters} ${styles.followups}`}
+      >
+        {questions.map((q, k) => (
+          <li key={q} style={{ "--i": k } as CSSProperties}>
+            <button type="button" onClick={() => onAsk(q)}>
+              <span aria-hidden>↳</span>
+              {q}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </>
+  );
 }
 
 function ResetIcon() {
@@ -125,13 +259,87 @@ export function JontyChat() {
   const [busy, setBusy] = useState(false);
   const [intro, setIntro] = useState(() => ({
     greeting: GREETINGS[0],
-    starters: STARTERS.slice(0, 3),
+    seed: 0,
   }));
+  // The starter questions follow whichever page the visitor is on.
+  const pageQuestions = startersFor(pathname);
   const input = useRef<HTMLTextAreaElement>(null);
   const log = useRef<HTMLDivElement>(null);
   const abort = useRef<AbortController | null>(null);
   const launcher = useRef<HTMLButtonElement>(null);
+  const content = useRef<HTMLDivElement>(null);
   const wasOpen = useRef(false);
+  // Highlighted text on the page, and where to float the "Ask" button over it.
+  const [selection, setSelection] = useState<{
+    text: string;
+    x: number;
+    top: number;
+    bottom: number;
+  } | null>(null);
+  // A highlighted passage waiting in the composer for a question.
+  const [quote, setQuote] = useState<string | null>(null);
+
+  // Watch for text highlighted on the page (not in the chat or a form field).
+  useEffect(() => {
+    let pointerDown = false;
+    let timer = 0;
+    const read = () => {
+      const sel = window.getSelection();
+      const text = sel?.toString().replace(/\s+/g, " ").trim() ?? "";
+      if (!sel || sel.isCollapsed || !sel.rangeCount || text.length < 3)
+        return setSelection(null);
+      const node = sel.anchorNode;
+      const el = node instanceof Element ? node : node?.parentElement;
+      if (!el || el.closest("[data-chat], input, textarea, [contenteditable]"))
+        return setSelection(null);
+      const rect = sel.getRangeAt(0).getBoundingClientRect();
+      if (!rect.width && !rect.height) return setSelection(null);
+      setSelection({
+        text: clip(text),
+        x: rect.left + rect.width / 2,
+        top: rect.top,
+        bottom: rect.bottom,
+      });
+    };
+    const onDown = () => (pointerDown = true);
+    const onUp = () => {
+      pointerDown = false;
+      requestAnimationFrame(read); // the selection settles after the pointer lifts
+    };
+    // Keyboard selection and phone selection handles don't end with a mouseup.
+    const onChange = () => {
+      window.clearTimeout(timer);
+      if (window.getSelection()?.isCollapsed) setSelection(null);
+      else if (!pointerDown) timer = window.setTimeout(read, 250);
+    };
+    const onScroll = read; // keep the button pinned to the highlight
+    document.addEventListener("pointerdown", onDown);
+    document.addEventListener("pointerup", onUp);
+    document.addEventListener("selectionchange", onChange);
+    window.addEventListener("scroll", onScroll, {
+      capture: true,
+      passive: true,
+    });
+    window.addEventListener("resize", read);
+    return () => {
+      window.clearTimeout(timer);
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("pointerup", onUp);
+      document.removeEventListener("selectionchange", onChange);
+      window.removeEventListener("scroll", onScroll, { capture: true });
+      window.removeEventListener("resize", read);
+    };
+  }, []);
+
+  const askAboutSelection = () => {
+    if (!selection) return;
+    setQuote(selection.text);
+    setSelection(null);
+    window.getSelection()?.removeAllRanges();
+    if (!open && turns.length === 0) setIntro(pickIntro());
+    setOpen(true);
+    requestAnimationFrame(() => input.current?.focus());
+  };
 
   useEffect(() => {
     if (open) input.current?.focus();
@@ -139,9 +347,22 @@ export function JontyChat() {
     wasOpen.current = open;
   }, [open]);
 
+  // Keep the newest words in view as they appear.
   useEffect(() => {
-    log.current?.scrollTo({ top: log.current.scrollHeight });
-  }, [turns]);
+    const box = log.current;
+    const inner = content.current;
+    if (!box || !inner) return;
+    const follow = () => box.scrollTo({ top: box.scrollHeight });
+    follow();
+    const ro = new ResizeObserver(follow);
+    ro.observe(inner);
+    return () => ro.disconnect();
+  }, [turns.length]);
+
+  // On wide screens the panel pushes the page aside instead of covering it.
+  useEffect(() => {
+    document.documentElement.toggleAttribute("data-chat-open", open);
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -155,22 +376,35 @@ export function JontyChat() {
   useEffect(() => () => abort.current?.abort(), []);
 
   async function ask(question: string) {
-    const text = question.trim();
+    const text = question.trim() || (quote ? "Tell me more about this." : "");
     if (!text || busy) return;
-    const history: Turn[] = [...turns, { role: "user", content: text }];
+    const history: Turn[] = [
+      ...turns,
+      { role: "user", content: text, quote: quote ?? undefined },
+    ];
     setTurns([...history, { role: "assistant", content: "" }]);
     setDraft("");
+    setQuote(null);
     setBusy(true);
 
-    const write = (content: string) =>
-      setTurns((t) => [...t.slice(0, -1), { role: "assistant", content }]);
+    const write = (content: string, extra: Partial<Turn> = {}) =>
+      setTurns((t) => [
+        ...t.slice(0, -1),
+        { role: "assistant", content, streaming: false, ...extra },
+      ]);
 
     abort.current = new AbortController();
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: history, page: pathname }),
+        body: JSON.stringify({
+          messages: history.map((t) => ({
+            role: t.role,
+            content: messageFor(t),
+          })),
+          page: pathname,
+        }),
         signal: abort.current.signal,
       });
       if (res.status === 503) return write(NOT_READY);
@@ -183,13 +417,24 @@ export function JontyChat() {
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
-      let answer = "";
+      let raw = "";
       for (;;) {
         const { done, value } = await reader.read();
         if (done) break;
-        answer += decoder.decode(value, { stream: true });
-        write(answer);
+        raw += decoder.decode(value, { stream: true });
+        write(raw.split(RECORD_SEPARATOR)[0], { streaming: true });
       }
+      const [answer, extra] = raw.split(RECORD_SEPARATOR);
+      let meta: Pick<Turn, "followups" | "links"> = {};
+      try {
+        if (extra) meta = JSON.parse(extra);
+      } catch {}
+      // A page gets one card per conversation: skip any already linked above.
+      const linked = new Set(
+        turns.flatMap((t) => t.links?.map((l) => l.href) ?? []),
+      );
+      meta.links = meta.links?.filter((l) => !linked.has(l.href));
+      write(answer, { ...meta, page: pathname });
     } catch (error) {
       if ((error as Error).name !== "AbortError")
         write(
@@ -199,6 +444,15 @@ export function JontyChat() {
       setBusy(false);
     }
   }
+
+  // Mark an answer as fully shown, which brings in its follow-ups.
+  const revealed = useCallback(
+    (index: number) =>
+      setTurns((t) =>
+        t.map((turn, i) => (i === index ? { ...turn, revealed: true } : turn)),
+      ),
+    [],
+  );
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -216,6 +470,7 @@ export function JontyChat() {
     abort.current?.abort();
     setTurns([]);
     setDraft("");
+    setQuote(null);
     setBusy(false);
     setIntro(pickIntro());
     input.current?.focus();
@@ -279,7 +534,7 @@ export function JontyChat() {
             <div className={styles.intro}>
               <h3 className={styles.greeting}>{intro.greeting}</h3>
               <ul className={styles.starters}>
-                {intro.starters.map((s) => (
+                {pickThree(pageQuestions, intro.seed).map((s) => (
                   <li key={s}>
                     <button type="button" onClick={() => void ask(s)}>
                       <span aria-hidden>↳</span>
@@ -290,39 +545,131 @@ export function JontyChat() {
               </ul>
             </div>
           ) : (
-            turns.map((t, i) => (
-              <p
-                key={i}
-                className={t.role === "user" ? styles.user : styles.assistant}
-              >
-                {t.content || (
-                  <span className={styles.typing} aria-label="Thinking" />
-                )}
-              </p>
-            ))
+            <div ref={content}>
+              {turns.map((t, i) =>
+                t.role === "user" ? (
+                  <div key={i} className={styles.userTurn}>
+                    {t.quote ? (
+                      <p className={styles.userQuote}>“{t.quote}”</p>
+                    ) : null}
+                    <p className={styles.user}>{t.content}</p>
+                  </div>
+                ) : (
+                  <div key={i}>
+                    <p className={styles.assistant}>
+                      {t.content ? (
+                        <RevealText
+                          text={t.content}
+                          streaming={!!t.streaming}
+                          onDone={() => revealed(i)}
+                        />
+                      ) : (
+                        <span
+                          className={styles.thinking}
+                          role="status"
+                          aria-label="Thinking"
+                        >
+                          <Sparkle />
+                        </span>
+                      )}
+                    </p>
+                    {t.revealed && t.links?.length ? (
+                      <LinkCards
+                        links={t.links}
+                        onOpen={() => {
+                          // Below 900px the panel covers the page, so get out of the way.
+                          if (!window.matchMedia("(min-width: 900px)").matches)
+                            setOpen(false);
+                        }}
+                      />
+                    ) : null}
+                    {i === turns.length - 1 && t.revealed ? (
+                      <Suggestions
+                        turn={t}
+                        pathname={pathname}
+                        asked={turns
+                          .filter((u) => u.role === "user")
+                          .map((u) => u.content)}
+                        onAsk={(q) => void ask(q)}
+                      />
+                    ) : null}
+                  </div>
+                ),
+              )}
+            </div>
           )}
         </div>
 
         <form className={styles.composer} onSubmit={onSubmit}>
-          <textarea
-            ref={input}
-            rows={1}
-            value={draft}
-            maxLength={800}
-            placeholder="Ask about Noirrit…"
-            onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={onKeyDown}
-            aria-label="Your question"
-          />
-          <button
-            type="submit"
-            disabled={busy || !draft.trim()}
-            aria-label="Send"
-          >
-            <SendIcon />
-          </button>
+          {quote ? (
+            <div className={styles.quote}>
+              <span className={styles.quoteMark} aria-hidden>
+                “
+              </span>
+              <p>{quote}</p>
+              <button
+                type="button"
+                className={styles.quoteClear}
+                onClick={() => {
+                  setQuote(null);
+                  input.current?.focus();
+                }}
+                aria-label="Remove quote"
+              >
+                <CloseIcon />
+              </button>
+            </div>
+          ) : null}
+          <div className={styles.row}>
+            <textarea
+              ref={input}
+              rows={1}
+              value={draft}
+              maxLength={800}
+              placeholder={
+                quote ? "Ask about this quote…" : "Ask about Noirrit…"
+              }
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={onKeyDown}
+              aria-label="Your question"
+            />
+            <button
+              type="submit"
+              disabled={busy || (!draft.trim() && !quote)}
+              aria-label="Send"
+            >
+              <SendIcon />
+            </button>
+          </div>
         </form>
       </section>
+
+      {selection ? (
+        <button
+          type="button"
+          className={styles.askSelection}
+          style={
+            selection.top > 56
+              ? {
+                  left: selection.x,
+                  top: selection.top - 8,
+                  translate: "-50% -100%",
+                }
+              : {
+                  left: selection.x,
+                  top: selection.bottom + 8,
+                  translate: "-50% 0",
+                }
+          }
+          // keep the highlight while clicking
+          onPointerDown={(e) => e.preventDefault()}
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={askAboutSelection}
+        >
+          <Sparkle />
+          Ask JontyLLM
+        </button>
+      ) : null}
     </div>
   );
 }

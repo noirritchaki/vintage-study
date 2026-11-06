@@ -1,0 +1,276 @@
+/* "vintage stuff i own": a full-screen stage with the title in the middle and
+   the pieces floating around it. Hovering one shows a handwritten note. */
+
+.stage {
+  position: relative;
+  height: 100svh;
+  min-height: 560px;
+  overflow: hidden;
+  background: #fff;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  color: #1f1f22;
+}
+
+.center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  animation: fadeIn 0.6s ease both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+/* the home page's headline type, bigger */
+.title {
+  margin: 0;
+  font-size: 44px;
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -3px;
+  white-space: nowrap;
+}
+
+.shuffle {
+  margin-top: 18px;
+  padding: 6px 16px;
+  border: 1px solid #1f1f22;
+  border-radius: 999px;
+  background: #fff;
+  color: #1f1f22;
+  font: inherit;
+  font-size: 14px;
+  letter-spacing: -0.3px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.shuffle:hover {
+  border-color: #ce0e9b;
+  background: #ce0e9b;
+  color: #fff;
+}
+
+.shuffle:focus-visible {
+  outline: 2px dotted #1f1f22;
+  outline-offset: 3px;
+}
+
+.hint {
+  margin: 10px 0 0;
+  font-family: var(--font-caveat), cursive;
+  font-size: 18px;
+  color: #a3a3a8;
+}
+
+.hintTap {
+  display: none;
+}
+
+/* touch screens can't hover */
+@media (hover: none) {
+  .hintHover {
+    display: none;
+  }
+
+  .hintTap {
+    display: inline;
+  }
+}
+
+.pieces {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* each piece glides to its spot when shuffled */
+.piece {
+  position: absolute;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  outline: none;
+  cursor: default;
+  transition:
+    left 1s cubic-bezier(0.2, 0.8, 0.2, 1),
+    top 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+  animation: fadeIn 0.8s ease both;
+  animation-delay: calc(var(--delay) * -0.15);
+}
+
+.piece:hover,
+.piece:focus {
+  z-index: 3;
+}
+
+/* a gentle float, each piece on its own rhythm */
+.bob {
+  display: block;
+  animation: bob var(--bob) ease-in-out var(--delay) infinite alternate;
+}
+
+@keyframes bob {
+  from {
+    transform: translateY(-5px);
+  }
+  to {
+    transform: translateY(6px);
+  }
+}
+
+.tilt {
+  display: block;
+  transform: rotate(var(--r));
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.piece:hover .tilt,
+.piece:focus .tilt {
+  transform: rotate(var(--r)) scale(1.06);
+}
+
+.tilt img {
+  display: block;
+  width: var(--w);
+  height: auto;
+  filter: drop-shadow(0 12px 14px rgba(0, 0, 0, 0.16));
+  user-select: none;
+}
+
+.placeholder {
+  display: grid;
+  place-items: center;
+  width: var(--w);
+  aspect-ratio: 1;
+  border: 1px dashed #d4d4d0;
+  background: #f6f6f3;
+  font-size: 11px;
+  color: #b0b0b0;
+  box-shadow: 0 12px 20px -10px rgba(0, 0, 0, 0.18);
+}
+
+/* the note: handwriting with a hand-drawn arrow pointing at the piece. It sits
+   above the piece, or below it for pieces near the top of the screen. */
+.note {
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 30%;
+  display: flex;
+  align-items: flex-start;
+  width: max-content;
+  max-width: 230px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.piece[data-below] .note {
+  top: calc(100% + 2px);
+  bottom: auto;
+  flex-direction: column-reverse;
+  align-items: flex-start;
+  transform: translateY(-4px);
+}
+
+.piece[data-below] .note svg {
+  transform: scaleY(-1);
+}
+
+.note svg {
+  flex: none;
+  fill: none;
+  stroke: #ce0e9b;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* the arrow draws itself in */
+.note path {
+  stroke-dasharray: 40;
+  stroke-dashoffset: 40;
+  transition: stroke-dashoffset 0.35s ease 0.05s;
+}
+
+.note path + path {
+  transition-delay: 0.3s;
+}
+
+.note > span {
+  margin: -12px 0 0 2px;
+  font-family: var(--font-caveat), cursive;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 22px;
+  color: #ce0e9b;
+  transform: rotate(-2deg);
+}
+
+.piece[data-below] .note > span {
+  margin: 0 0 -12px 30px;
+}
+
+.piece:hover .note,
+.piece:focus .note {
+  opacity: 1;
+  transform: none;
+}
+
+.piece:hover .note path,
+.piece:focus .note path {
+  stroke-dashoffset: 0;
+}
+
+/* phones: smaller pieces, spread wider */
+@media (max-width: 720px) {
+  /* two lines on phones, so the pieces at the sides have room */
+  .title {
+    font-size: 28px;
+    letter-spacing: -1.8px;
+  }
+
+  .title span {
+    display: block;
+  }
+
+  .tilt img,
+  .placeholder {
+    width: calc(var(--w) * 0.62);
+  }
+
+  .note {
+    max-width: 160px;
+  }
+
+  .note > span {
+    font-size: 17px;
+    line-height: 19px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .piece,
+  .bob,
+  .tilt,
+  .note,
+  .note path,
+  .center {
+    animation: none;
+    transition: none;
+  }
+}

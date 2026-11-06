@@ -3,6 +3,7 @@ export const pages = [
   { name: 'home', href: '/' },
   { name: 'about', href: '/about' },
   { name: 'what i like doing', href: '/hobbies' },
+  { name: 'vintage stuff i own', href: '/vintage' },
   { name: 'projects', href: '/projects' },
   { name: 'brew a cup of coffee', href: '/brew' },
 ] as const;

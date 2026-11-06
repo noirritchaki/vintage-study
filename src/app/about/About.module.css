@@ -18,6 +18,95 @@
   color: var(--ink-3);
 }
 
+/* a phrase with a dotted underline; hovering (or tapping) it shows a little
+   hand-drawn note pointing at it */
+.annotated {
+  position: relative;
+  padding-bottom: 2px;
+  background: radial-gradient(circle, #b5b5b5 1px, transparent 1.4px) left bottom / 5px 3px repeat-x;
+  cursor: default;
+  outline: none;
+}
+
+.note {
+  position: absolute;
+  bottom: calc(100% - 2px);
+  left: 35%;
+  display: flex;
+  align-items: flex-start;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.note svg {
+  flex: none;
+  fill: none;
+  stroke: #ce0e9b;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* the arrow draws itself in */
+.note path {
+  stroke-dasharray: 40;
+  stroke-dashoffset: 40;
+  transition: stroke-dashoffset 0.35s ease 0.05s;
+}
+
+.note path + path {
+  transition-delay: 0.3s;
+}
+
+.note > span {
+  margin: -13px 0 0 2px;
+  padding: 0 6px;
+  white-space: nowrap;
+  font-family: var(--font-caveat), cursive;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 22px;
+  letter-spacing: 0;
+  color: #ce0e9b;
+  background: #fff;
+  transform: rotate(-2deg);
+}
+
+.annotated:hover .note,
+.annotated:focus .note {
+  opacity: 1;
+  transform: none;
+}
+
+.annotated:hover .note path,
+.annotated:focus .note path {
+  stroke-dashoffset: 0;
+}
+
+/* phones: wrap the note so it can't run off the edge */
+@media (max-width: 720px) {
+  .note {
+    left: 10%;
+  }
+
+  .note > span {
+    width: max-content;
+    max-width: 190px;
+    white-space: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .note,
+  .note path {
+    transition: none;
+  }
+}
+
 .timeline {
   max-width: 560px;
   margin: 48px 0 0;
@@ -134,72 +223,6 @@ a.company:hover {
 .placeholder {
   width: 100%;
   background: repeating-linear-gradient(-45deg, #f6f6f4 0 10px, #efeee9 10px 20px);
-}
-
-/* Hover: the cursor becomes a magenta square with the photo's caption. */
-.frame {
-  display: block;
-}
-
-.grid[data-custom-cursor] .frame {
-  cursor: none;
-}
-
-.cursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  /* zero-height row: the square and tag centre on the pointer's y */
-  height: 0;
-  pointer-events: none;
-  will-change: transform;
-}
-
-.cursorDot,
-.cursorTag {
-  opacity: 0;
-  transform: scale(0.6);
-  transform-origin: left center;
-  transition:
-    opacity 0.18s ease,
-    transform 0.22s cubic-bezier(0.3, 1.4, 0.5, 1);
-}
-
-.cursorDot {
-  width: 10px;
-  height: 10px;
-  flex: none;
-  margin-left: -5px;
-  background: #ce0e9b;
-}
-
-.cursorTag {
-  padding: 3px 8px 4px;
-  background: #ce0e9b;
-  color: #fff;
-  font-size: 13px;
-  line-height: 1.2;
-  letter-spacing: -0.2px;
-  white-space: nowrap;
-  transition-delay: 0.03s;
-}
-
-.cursor[data-visible] .cursorDot,
-.cursor[data-visible] .cursorTag {
-  opacity: 1;
-  transform: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cursorDot,
-  .cursorTag {
-    transform: none;
-    transition: opacity 0.1s linear;
-  }
 }
 
 @media (max-width: 720px) {

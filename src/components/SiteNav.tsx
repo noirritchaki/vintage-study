@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useId, useRef, useState, type CSSProperties } from 'react';
 import { pageIndexFor, pageNameFor, pages } from '@/data/pages';
 import styles from './SiteNav.module.css';
+import { Weather } from './Weather';
 
 /**
  * Loading the brew scene's code also starts fetching its models and textures,
@@ -56,66 +57,69 @@ export function SiteNav() {
   const others = pages.filter((_, i) => i !== current);
 
   return (
-    <nav
-      ref={root}
-      data-nav
-      aria-label="Site"
-      className={styles.nav}
-      data-open={open || undefined}
-      onPointerEnter={(e) => e.pointerType === 'mouse' && setOpen(true)}
-      onPointerLeave={(e) => e.pointerType === 'mouse' && setOpen(false)}
-      onFocus={(e) => {
-        // keyboard focus opens it; a tap's focus is left to the tap's click
-        if ((e.target as HTMLElement).matches(':focus-visible')) setOpen(true);
-      }}
-      onBlur={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget as Node)) setOpen(false);
-      }}
-      onKeyDown={(e) => {
-        if (e.key === 'Escape') {
-          setOpen(false);
-          label.current?.blur();
-        }
-      }}
-    >
-      <button
-        ref={label}
-        type="button"
-        className={styles.current}
-        aria-expanded={open}
-        aria-controls={listId}
-        aria-label={`Current page: ${name}. Show other pages`}
-        onPointerDown={(e) => (lastPointer.current = e.pointerType)}
-        onClick={() => {
-          // mouse users open it by hovering; taps and keyboard toggle it
-          if (lastPointer.current !== 'mouse') setOpen((o) => !o);
+    // data-nav: the 3D scenes ignore pointer events that start up here
+    <div className={styles.bar} data-nav>
+      <nav
+        ref={root}
+        aria-label="Site"
+        className={styles.nav}
+        data-open={open || undefined}
+        onPointerEnter={(e) => e.pointerType === 'mouse' && setOpen(true)}
+        onPointerLeave={(e) => e.pointerType === 'mouse' && setOpen(false)}
+        onFocus={(e) => {
+          // keyboard focus opens it; a tap's focus is left to the tap's click
+          if ((e.target as HTMLElement).matches(':focus-visible')) setOpen(true);
+        }}
+        onBlur={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget as Node)) setOpen(false);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') {
+            setOpen(false);
+            label.current?.blur();
+          }
         }}
       >
-        {/* keyed, so a new page's name plays the swap-in */}
-        <span key={name} className={styles.swap}>
-          {name}
-        </span>
-      </button>
+        <button
+          ref={label}
+          type="button"
+          className={styles.current}
+          aria-expanded={open}
+          aria-controls={listId}
+          aria-label={`Current page: ${name}. Show other pages`}
+          onPointerDown={(e) => (lastPointer.current = e.pointerType)}
+          onClick={() => {
+            // mouse users open it by hovering; taps and keyboard toggle it
+            if (lastPointer.current !== 'mouse') setOpen((o) => !o);
+          }}
+        >
+          {/* keyed, so a new page's name plays the swap-in */}
+          <span key={name} className={styles.swap}>
+            {name}
+          </span>
+        </button>
 
-      <ul id={listId} className={styles.menu}>
-        {others.map((p, i) => (
-          <li key={p.href} style={{ '--i': i } as CSSProperties}>
-            <Link
-              href={p.href}
-              className={styles.item}
-              tabIndex={open ? 0 : -1}
-              onPointerEnter={p.href === '/brew' ? warmBrew : undefined}
-              onFocus={p.href === '/brew' ? warmBrew : undefined}
-              onClick={() => {
-                setOpen(false);
-                label.current?.blur();
-              }}
-            >
-              {p.name}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </nav>
+        <ul id={listId} className={styles.menu}>
+          {others.map((p, i) => (
+            <li key={p.href} style={{ '--i': i } as CSSProperties}>
+              <Link
+                href={p.href}
+                className={styles.item}
+                tabIndex={open ? 0 : -1}
+                onPointerEnter={p.href === '/brew' ? warmBrew : undefined}
+                onFocus={p.href === '/brew' ? warmBrew : undefined}
+                onClick={() => {
+                  setOpen(false);
+                  label.current?.blur();
+                }}
+              >
+                {p.name}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <Weather />
+    </div>
   );
 }

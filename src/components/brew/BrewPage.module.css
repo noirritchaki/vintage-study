@@ -1,6 +1,8 @@
 .root {
   position: fixed;
   inset: 0;
+  right: var(--chat-push, 0px); /* makes room for the chat panel */
+  transition: right var(--chat-ease);
   overflow: hidden;
   background: #fff;
 }

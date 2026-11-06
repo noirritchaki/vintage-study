@@ -6,7 +6,7 @@
 .title {
   position: fixed;
   top: calc(50% - 335px * var(--u, 1) - 90px * min(1, var(--u, 1)));
-  left: 50%;
+  left: calc(50% - var(--chat-push, 0px) / 2); /* stays centred when the chat pushes the page */
   z-index: 30;
   display: flex;
   flex-direction: column;
@@ -17,7 +17,8 @@
   pointer-events: none;
   transition:
     opacity 0.35s ease,
-    transform 0.35s ease;
+    transform 0.35s ease,
+    left var(--chat-ease);
 }
 
 /* Out of the way while brewing; the guide windows take over. */

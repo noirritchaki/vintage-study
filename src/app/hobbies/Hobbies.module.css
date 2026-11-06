@@ -1,0 +1,117 @@
+/* "What I like doing", after rachelchen.tech/fun: filter chips over a
+   four-column masonry of photo cards. */
+
+.wide {
+  max-width: 940px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 64px 0 24px;
+}
+
+.chip {
+  padding: 3px 7px 4px;
+  border: 0;
+  background: transparent;
+  color: var(--ink-3);
+  font: inherit;
+  font-size: 15px;
+  letter-spacing: -0.3px;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.chip:hover {
+  color: var(--ink);
+}
+
+.chip[aria-pressed='true'] {
+  background: #ce0e9b;
+  color: #fff;
+}
+
+.chip:focus-visible {
+  outline: 2px dotted var(--ink);
+  outline-offset: 2px;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  align-items: start;
+  animation: fadeIn 0.35s ease both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.photo {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.placeholder {
+  width: 100%;
+  background: repeating-linear-gradient(-45deg, #f6f6f4 0 10px, #efeee9 10px 20px);
+}
+
+.title {
+  margin: 10px 0 0;
+  font-size: 15px;
+  line-height: 1.4;
+  letter-spacing: -0.3px;
+  color: var(--ink);
+}
+
+.subtitle {
+  margin: 1px 0 0;
+  font-size: 15px;
+  line-height: 1.4;
+  letter-spacing: -0.3px;
+  color: var(--ink-3);
+}
+
+.empty {
+  color: var(--ink-3);
+}
+
+@media (max-width: 720px) {
+  .chips {
+    margin-top: 40px;
+  }
+
+  .board {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .column {
+    gap: 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .board {
+    animation: none;
+  }
+}

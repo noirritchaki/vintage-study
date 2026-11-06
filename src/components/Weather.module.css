@@ -1,0 +1,194 @@
+/* Bangalore's weather beside the nav: same grey type, a small animated icon
+   (grey with a magenta accent), and the conditions sliding out on hover. */
+
+.weather {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  color: #a3a3a8;
+  white-space: nowrap;
+  cursor: default;
+  animation: fadeIn 0.6s ease both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+.more {
+  display: grid;
+  grid-template-columns: 0fr;
+  transition: grid-template-columns 0.3s ease;
+}
+
+.more > span {
+  overflow: hidden;
+}
+
+.weather:hover .more {
+  grid-template-columns: 1fr;
+}
+
+.icon {
+  flex: none;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.accent {
+  stroke: #ce0e9b;
+}
+
+/* clouds are filled white so they sit in front of the sun / moon */
+.fill {
+  fill: #fff;
+}
+
+/* sun: the rays turn slowly */
+.rays {
+  transform-origin: 12px 12px;
+  animation: spin 14s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* behind a cloud, the sun / moon is smaller and up in the corner */
+.sunSmall {
+  transform: translate(3.5px, -3px) scale(0.75);
+  transform-origin: 12px 12px;
+}
+
+/* moon: rocks gently, with a star twinkling */
+.moon {
+  transform-origin: 12px 12px;
+  animation: rock 5s ease-in-out infinite;
+}
+
+@keyframes rock {
+  50% {
+    transform: rotate(-8deg);
+  }
+}
+
+.twinkle {
+  stroke: #ce0e9b;
+  stroke-width: 1.2;
+  transform-origin: 18.5px 4.7px;
+  animation: twinkle 2.4s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  50% {
+    opacity: 0.2;
+    transform: scale(0.5);
+  }
+}
+
+/* clouds drift side to side */
+.cloud {
+  animation: drift 4s ease-in-out infinite;
+}
+
+.cloudBack {
+  animation: drift 4s ease-in-out infinite reverse;
+}
+
+@keyframes drift {
+  50% {
+    translate: 1px 0;
+  }
+}
+
+/* rain and drizzle fall and fade */
+.drop {
+  animation: fall 0.9s linear infinite;
+}
+
+@keyframes fall {
+  from {
+    opacity: 0;
+    translate: 0.3px -1.5px;
+  }
+  30% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    translate: -0.6px 3px;
+  }
+}
+
+/* snow drifts down slower */
+.flake {
+  animation: snow 2.4s linear infinite;
+}
+
+@keyframes snow {
+  from {
+    opacity: 0;
+    translate: 0 -2px;
+  }
+  30% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    translate: 1px 4px;
+  }
+}
+
+/* storms: the bolt flashes now and then */
+.bolt {
+  animation: flash 3s steps(1) infinite;
+}
+
+@keyframes flash {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  70%,
+  76%,
+  84% {
+    opacity: 1;
+  }
+  73%,
+  80% {
+    opacity: 0;
+  }
+}
+
+/* fog: the mist lines slide back and forth */
+.mist {
+  animation: mist 3s ease-in-out infinite;
+}
+
+@keyframes mist {
+  50% {
+    translate: 2px 0;
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .weather,
+  .icon *,
+  .icon {
+    animation: none !important;
+  }
+
+  .bolt {
+    opacity: 1;
+  }
+}

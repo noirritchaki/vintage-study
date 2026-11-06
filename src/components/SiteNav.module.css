@@ -1,15 +1,23 @@
 /* Plain-text nav: the current page in light grey, top-left. The other pages
    reveal downwards on hover, one after another. Grey → magenta on hover. */
 
-.nav {
+/* the nav and, beside it, the weather */
+.bar {
   position: fixed;
   top: 20px;
   left: 24px;
   z-index: 50;
+  display: flex;
+  align-items: flex-start;
+  gap: 22px;
   font-family: var(--font-inter), system-ui, sans-serif;
   font-size: 15px;
   line-height: 20px;
   letter-spacing: -0.3px;
+}
+
+.nav {
+  position: relative;
 }
 
 .current {
@@ -106,7 +114,7 @@
 }
 
 @media (max-width: 720px) {
-  .nav {
+  .bar {
     top: 18px;
     left: 16px;
   }

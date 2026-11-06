@@ -17,20 +17,47 @@
   }
 }
 
-.eject {
-  display: inline-flex;
+/* case studies: "⏏ eject / Title" pinned top-left, where the site nav sits on
+   other pages (it's hidden here) */
+.crumbs {
+  position: fixed;
+  top: 20px;
+  left: 24px;
+  z-index: 50;
+  display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 16px;
-  font-weight: 500;
-  letter-spacing: -0.65px;
-  text-decoration: none;
-  color: var(--ink-2);
-  transition: color 0.15s ease;
+  gap: 8px;
+  font-size: 15px;
+  line-height: 20px;
+  letter-spacing: -0.3px;
+  color: #4a4a4f;
+  animation: fadeIn 0.6s ease both;
 }
 
-.eject:hover {
-  color: var(--ink);
+.crumbs > span[aria-hidden] {
+  color: #d0d0d4;
+}
+
+.crumbBack {
+  color: #a3a3a8;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.crumbBack:hover {
+  color: #ce0e9b;
+}
+
+.crumbBack:focus-visible {
+  outline: 2px dotted #1f1f22;
+  outline-offset: 3px;
+}
+
+@media (max-width: 720px) {
+  .crumbs {
+    top: 18px;
+    left: 16px;
+  }
 }
 
 .kicker {
@@ -105,7 +132,6 @@
 .placeholder {
   aspect-ratio: 16 / 9;
   margin-top: 20px;
-  border-radius: 12px;
   background: repeating-linear-gradient(-45deg, #f6f6f6 0 12px, #f0f0f0 12px 24px);
 }
 
@@ -210,7 +236,6 @@
   margin: 0 0 24px;
   padding: 0;
   list-style: none;
-  border-radius: 16px;
   background: #f7f6f0;
 }
 
@@ -244,6 +269,127 @@
   font-size: 13px;
   line-height: 1.4;
   color: var(--ink-3);
+}
+
+/* "the solution": a chapter of its own, showing the final designs as
+   numbered panels with a big image each */
+.solutionTitle {
+  margin: 28px 0 0;
+  font-size: 34px;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -1.6px;
+}
+
+.solutionIntro {
+  margin: 12px 0 28px;
+  font-size: 16px;
+  line-height: 1.6;
+  letter-spacing: -0.35px;
+  color: var(--ink-3);
+}
+
+.solutionList {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.solutionItem {
+  padding: 24px;
+}
+
+.solutionItem h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.4px;
+}
+
+.solutionItem h3 span {
+  color: #ce0e9b;
+}
+
+.solutionItem p {
+  margin: 4px 0 16px;
+  font-size: 14px;
+  line-height: 1.55;
+  letter-spacing: -0.3px;
+  color: var(--ink-2);
+}
+
+.solutionMedia {
+  display: block;
+  width: 100%;
+  height: auto;
+  background-color: #fff;
+}
+
+.solutionItem .placeholder {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 10;
+  margin-top: 0;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+/* a looping walkthrough: pause / replay appear top-left while hovering the panel */
+.videoWrap {
+  position: relative;
+}
+
+/* transparent walkthroughs sit straight on the panel's watercolor */
+.videoWrap .solutionMedia {
+  background: none;
+}
+
+.videoControls {
+  position: absolute;
+  z-index: 2; /* above the grain */
+  top: 12px;
+  left: 12px;
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.solutionItem:hover .videoControls,
+.videoControls:focus-within {
+  opacity: 1;
+}
+
+/* no hover on touch screens, so keep them showing */
+@media (hover: none) {
+  .videoControls {
+    opacity: 1;
+  }
+}
+
+.videoControls button {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  background: rgba(255, 255, 255, 0.92);
+  color: #1f1f22;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.videoControls button:hover {
+  color: #ce0e9b;
+}
+
+.videoControls button:focus-visible {
+  outline: 2px dotted #fff;
+  outline-offset: 2px;
 }
 
 .chapter {
@@ -350,7 +496,6 @@
 .note {
   margin: 8px 0 0;
   padding: 14px 16px;
-  border-radius: 10px;
   background: #f7f6f0;
   font-size: 14px;
   line-height: 1.55;
@@ -365,22 +510,213 @@
   margin: 28px 0 8px;
 }
 
+/* a user quote: serif, with a big opening mark and who said it underneath */
+.quote {
+  position: relative;
+  margin: 8px 0 24px;
+  padding: 22px 26px 22px 56px;
+  /* the watercolor's teal (#7fe7db on average), washed out so the quote reads easily */
+  background: #e5faf8;
+}
+
+.quote::before {
+  content: '“';
+  position: absolute;
+  top: 18px;
+  left: 22px;
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 34px;
+  line-height: 1;
+  color: #ce0e9b;
+}
+
+.quote blockquote {
+  margin: 0;
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 17px;
+  line-height: 1.6;
+  letter-spacing: -0.2px;
+  color: var(--ink);
+}
+
+/* a table of coloured levels (optimal → needs attention) and what each means */
+.scale {
+  width: 100%;
+  margin: 8px 0 24px;
+  border: 1px solid #e8e8e6;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.scale th {
+  padding: 14px 20px;
+  border-bottom: 1px solid #e8e8e6;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.scale td {
+  padding: 18px 20px;
+  vertical-align: top;
+  font-size: 15px;
+  line-height: 1.55;
+  letter-spacing: -0.3px;
+  color: var(--ink-2);
+}
+
+.scale td:first-child {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.scale tbody tr + tr td {
+  border-top: 1px solid #e8e8e6;
+}
+
+/* plain tables reuse the levels table's look; row headings in darker ink */
+.tableWrap {
+  overflow-x: auto;
+  margin: 8px 0 24px;
+}
+
+.tableWrap .table {
+  margin: 0;
+}
+
+.table tbody th {
+  padding: 16px 20px;
+  vertical-align: top;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+  text-transform: none;
+  line-height: 1.5;
+  color: var(--ink);
+  border-bottom: 0;
+}
+
+.table td {
+  font-size: 14px;
+}
+
+.table td:first-child {
+  width: auto;
+  white-space: normal;
+}
+
+.table tbody tr + tr th {
+  border-top: 1px solid #e8e8e6;
+}
+
+.level {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.level::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.level[data-tone='good'] {
+  color: #1e8a4c;
+  background: #e8f6ee;
+}
+
+.level[data-tone='warn'] {
+  color: #a76a00;
+  background: #fdf3dc;
+}
+
+.level[data-tone='bad'] {
+  color: #c93a3a;
+  background: #fdeaea;
+}
+
+.figure + .body {
+  margin-top: 28px;
+}
+
+.figure + .quote {
+  margin-top: 32px;
+}
+
+.quote figcaption {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
 .figure .placeholder {
   display: grid;
   place-items: center;
   margin-top: 0;
 }
 
-.figure .placeholder span {
+/* case study placeholders and transparent designs sit on a watercolor wash */
+.figure .placeholder,
+.solutionItem,
+.backdrop {
+  background: #9fe8dc url('/work/backdrop.webp') center / cover;
+}
+
+.figure .placeholder span,
+.solutionItem .placeholder span {
   font-size: 13px;
-  color: #b0b0b0;
+  color: rgba(0, 92, 82, 0.55);
+}
+
+.backdrop {
+  padding: 5% 4%;
+}
+
+/* film grain over every image card (designs included), like printed paper */
+.backdrop,
+.solutionItem,
+.figure .placeholder {
+  position: relative;
+  isolation: isolate;
+}
+
+.backdrop::after,
+.solutionItem::after,
+.figure .placeholder::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 220px 220px;
+  mix-blend-mode: multiply;
+  opacity: 0.22;
+}
+
+.backdrop img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .figureImage {
   display: block;
   width: 100%;
   height: auto;
-  border-radius: 12px;
 }
 
 .figure figcaption {
@@ -425,4 +761,9 @@
   .partHead {
     position: static;
   }
+}
+
+/* sections the chapter list jumps to land with a little room above */
+.anchor {
+  scroll-margin-top: 48px;
 }

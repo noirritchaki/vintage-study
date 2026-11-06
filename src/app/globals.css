@@ -17,3 +17,33 @@ body {
 a {
   color: inherit;
 }
+
+/* JontyLLM: on wide screens the chat panel pushes the page aside rather than
+   covering it. Full-screen pages (home, brew) shrink from the right; normal
+   pages get a right margin. */
+:root {
+  --chat-ease: 0.45s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+@media (min-width: 900px) {
+  html[data-chat-open] {
+    --chat-push: 384px;
+  }
+}
+
+body {
+  margin-right: var(--chat-push, 0px);
+  transition: margin-right var(--chat-ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body {
+    transition: none;
+  }
+}
+
+/* highlighted text in the site's magenta (highlighting also offers "Ask JontyLLM") */
+::selection {
+  background: rgba(206, 14, 155, 0.13);
+  color: #ce0e9b;
+}

@@ -1,17 +1,16 @@
 'use client';
 
 import Image from 'next/image';
-import { useRef, useState, useSyncExternalStore, type PointerEvent } from 'react';
-import { createPortal } from 'react-dom';
 import type { PhotoGroup } from '@/data/about';
+import { useHoverTag } from '@/components/HoverTag';
 import styles from './About.module.css';
 
 /**
- * Four-column photo grid. On hover (mouse/trackpad only) the cursor turns
- * into a small square with the photo's caption riding beside it, after
- * rachelchen.tech/about.
+ * Four-column photo grid with group labels. Hovering a photo shows its
+ * caption in the magenta cursor tag, after rachelchen.tech/about.
  */
 export function PhotoGrid({ groups }: { groups: PhotoGroup[] }) {
+  const tag = useHoverTag();
   const cells = groups.flatMap((group, g) =>
     group.photos.map((photo, i) => ({
       key: `${g}-${i}`,
@@ -21,17 +20,9 @@ export function PhotoGrid({ groups }: { groups: PhotoGroup[] }) {
     })),
   );
 
-  const cursor = useRef<HTMLDivElement>(null);
-  const [caption, setCaption] = useState<string | null>(null);
-  const fine = useSyncExternalStore(subscribeFine, isFine, () => false);
-
-  const move = (e: PointerEvent) => {
-    if (cursor.current) cursor.current.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
-  };
-
   return (
     <>
-      <ul className={styles.grid} data-custom-cursor={fine || undefined} aria-label="Photos">
+      <ul className={`${styles.grid} ${tag.containerClass ?? ''}`} aria-label="Photos">
         {cells.map(({ key, label, caption: text, photo }) => (
           <li key={key} className={styles.cell}>
             <p className={styles.label} aria-hidden={!label}>
@@ -41,16 +32,27 @@ export function PhotoGrid({ groups }: { groups: PhotoGroup[] }) {
                 </>
               )}
             </p>
-            <div
-              className={styles.frame}
-              onPointerEnter={(e) => {
-                move(e);
-                setCaption(text);
-              }}
-              onPointerMove={move}
-              onPointerLeave={() => setCaption(null)}
-            >
-              {photo.src ? (
+            <div {...tag.bind(text)}>
+              {photo.video ? (
+                // Muted, inline, looping clip: no controls, can't be opened
+                // full screen or picture-in-picture.
+                <video
+                  className={styles.photo}
+                  style={{ aspectRatio: photo.ratio, objectFit: 'cover' }}
+                  src={photo.video}
+                  poster={photo.poster}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                  disablePictureInPicture
+                  disableRemotePlayback
+                  controlsList="nodownload nofullscreen noremoteplayback"
+                  onContextMenu={(e) => e.preventDefault()}
+                  aria-label={photo.alt ?? text}
+                />
+              ) : photo.src ? (
                 <Image
                   src={photo.src}
                   alt={photo.alt ?? text}
@@ -66,26 +68,7 @@ export function PhotoGrid({ groups }: { groups: PhotoGroup[] }) {
           </li>
         ))}
       </ul>
-
-      {/* Portalled to <body>: the page's fade-in animates a transform, which
-          would otherwise make it the frame of reference for this fixed tag. */}
-      {fine &&
-        createPortal(
-          <div ref={cursor} className={styles.cursor} data-visible={caption ? true : undefined} aria-hidden>
-            <span className={styles.cursorDot} />
-            <span className={styles.cursorTag}>{caption}</span>
-          </div>,
-          document.body,
-        )}
+      {tag.element}
     </>
   );
-}
-
-// Only mouse/trackpad users get the custom cursor.
-const FINE = '(hover: hover) and (pointer: fine)';
-const isFine = () => window.matchMedia(FINE).matches;
-function subscribeFine(onChange: () => void) {
-  const mq = window.matchMedia(FINE);
-  mq.addEventListener('change', onChange);
-  return () => mq.removeEventListener('change', onChange);
 }

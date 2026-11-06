@@ -1,0 +1,117 @@
+/* Case study chapters, pinned to the left like the site nav: light grey text,
+   the section being read in magenta with the nav's square marker beside it.
+   Only on screens wide enough to fit it beside the page. */
+
+.toc {
+  position: fixed;
+  top: 50%;
+  left: 24px;
+  z-index: 40;
+  display: none;
+  width: 184px;
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+  transform: translateY(-50%);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.35;
+  letter-spacing: -0.2px;
+  scrollbar-width: none;
+  animation: tocIn 0.6s ease 0.2s both;
+}
+
+@keyframes tocIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (min-width: 1320px) {
+  .toc {
+    display: block;
+  }
+}
+
+/* when the chat panel pushes the page aside, there's no room beside it */
+:global(html[data-chat-open]) .toc {
+  display: none;
+}
+
+.toc ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.link {
+  position: relative;
+  display: block;
+  padding: 4px 0 4px 12px;
+  color: #a3a3a8;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.link[data-inside] {
+  color: #6b6b70;
+}
+
+.link:hover {
+  color: #1f1f22;
+}
+
+.link[data-active] {
+  color: #ce0e9b;
+}
+
+/* the nav's "you are here" square */
+.link[data-active]::before {
+  content: '';
+  position: absolute;
+  top: calc(4px + 0.675em);
+  left: 0;
+  width: 5px;
+  height: 5px;
+  margin-top: -2.5px;
+  background: #ce0e9b;
+}
+
+.link:focus-visible {
+  outline: 2px dotted #1f1f22;
+  outline-offset: 2px;
+}
+
+/* a chapter's sections open underneath while you're in it */
+.sub {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s ease;
+}
+
+.sub > li {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sub[data-open] {
+  grid-template-rows: 1fr;
+}
+
+.sub .link {
+  padding-left: 24px;
+  font-size: 12px;
+}
+
+.sub .link[data-active]::before {
+  left: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toc {
+    animation: none;
+  }
+
+  .sub {
+    transition: none;
+  }
+}

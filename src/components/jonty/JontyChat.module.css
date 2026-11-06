@@ -82,17 +82,67 @@
   border-left: 1px solid var(--hair);
   font-family: var(--font-inter), system-ui, sans-serif;
   color: var(--ink);
-  transform: translateX(100%);
+  /* opens like RacheLLM: the sheet widens from the right edge (in step with
+     the page being pushed aside), then its contents fade in */
+  clip-path: inset(0 0 0 100%);
   visibility: hidden;
   transition:
-    transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1),
-    visibility 0s linear 0.35s;
+    clip-path var(--chat-ease),
+    visibility 0s linear 0.45s;
 }
 
 .panel[data-open] {
-  transform: none;
+  clip-path: inset(0);
   visibility: visible;
-  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition: clip-path var(--chat-ease);
+}
+
+.panel > * {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.panel[data-open] > * {
+  opacity: 1;
+  transition: opacity 0.3s ease 0.22s;
+}
+
+/* each word of an answer eases in from faint and soft */
+.word {
+  animation: wordIn 0.5s ease-out both;
+}
+
+@keyframes wordIn {
+  from {
+    opacity: 0.2;
+    filter: blur(1.5px);
+  }
+}
+
+/* follow-up questions drift in one after another once the answer is shown */
+.followups {
+  margin-top: 4px;
+}
+
+/* "about this page": shown when the suggestions switch to the page the visitor moved to */
+.pageNote {
+  margin: 4px 0 2px;
+  font-size: 12px;
+  letter-spacing: -0.1px;
+  color: var(--ink-3);
+  animation: followIn 0.4s ease-out both;
+}
+
+.followups li {
+  animation: followIn 0.4s ease-out both;
+  animation-delay: calc(var(--i) * 80ms);
+}
+
+@keyframes followIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
 }
 
 .header {
@@ -132,7 +182,9 @@
 
 .icon:focus-visible,
 .starters button:focus-visible,
-.composer button:focus-visible {
+.row button:focus-visible,
+.quoteClear:focus-visible,
+.askSelection:focus-visible {
   outline: 2px dotted var(--ink);
   outline-offset: 2px;
 }
@@ -207,32 +259,239 @@
   white-space: pre-wrap;
 }
 
-.user:first-child {
+/* link cards: a page the answer is about, thumbnail on top */
+.cards {
+  display: grid;
+  gap: 10px;
+  margin: -4px 0 18px;
+  padding: 0;
+  list-style: none;
+}
+
+.cards li {
+  animation: followIn 0.4s ease-out both;
+  animation-delay: calc(var(--i) * 80ms);
+}
+
+.card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  background: #fff;
+  border: 1px solid var(--hair);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.thumb {
+  grid-column: 1 / -1;
+  display: block;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #f1f1ef;
+  border-bottom: 1px solid var(--hair);
+}
+
+.thumb img,
+.thumb video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.cardText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding: 10px 0 11px 13px;
+}
+
+.cardTitle {
+  font-size: 15px;
+  transition: color 0.15s ease;
+}
+
+.cardSub {
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--ink-3);
+}
+
+.cardArrow {
+  align-self: center;
+  padding: 0 14px;
+  color: var(--ink-3);
+  transition:
+    color 0.15s ease,
+    transform 0.2s ease;
+}
+
+.card:hover .cardTitle,
+.card:hover .cardArrow {
+  color: #ce0e9b;
+}
+
+.card:hover .cardArrow {
+  transform: translateX(3px);
+}
+
+.card:hover .thumb img,
+.card:hover .thumb video {
+  transform: scale(1.03);
+}
+
+.card:focus-visible {
+  outline: 2px dotted var(--ink);
+  outline-offset: 2px;
+}
+
+.userTurn:first-child {
   margin-top: auto;
 }
 
-/* three-dot "thinking" */
-.typing {
-  display: inline-block;
-  width: 24px;
-  height: 8px;
-  background:
-    radial-gradient(circle, var(--ink-3) 2.5px, transparent 3px) 0 50% / 8px 8px no-repeat,
-    radial-gradient(circle, var(--ink-3) 2.5px, transparent 3px) 8px 50% / 8px 8px no-repeat,
-    radial-gradient(circle, var(--ink-3) 2.5px, transparent 3px) 16px 50% / 8px 8px no-repeat;
-  animation: typing 1s ease-in-out infinite;
+/* the passage a question was about, above the question */
+.userQuote {
+  display: -webkit-box;
+  max-width: 85%;
+  margin: 16px 0 -10px auto;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--ink-3);
+  text-align: right;
 }
 
-@keyframes typing {
-  50% {
-    opacity: 0.35;
+/* a highlighted passage waiting for a question */
+.quote {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 6px -4px;
+  padding: 9px 6px 9px 10px;
+  background: #f4f4f2;
+  animation: followIn 0.25s ease-out both;
+}
+
+.quote p {
+  display: -webkit-box;
+  flex: 1;
+  margin: 0;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+.quoteMark {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 26px;
+  line-height: 26px;
+  height: 18px;
+  color: var(--ink-3);
+}
+
+.quoteClear {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+
+.quoteClear:hover {
+  color: #ce0e9b;
+}
+
+.quoteClear svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* "Ask JontyLLM", floating over text highlighted on the page */
+.askSelection {
+  position: fixed;
+  z-index: 58;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 11px 6px 9px;
+  border: 0;
+  background: #ce0e9b;
+  color: #fff;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 14px;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(206, 14, 155, 0.25);
+  animation: askIn 0.18s ease-out both;
+}
+
+.askSelection svg {
+  width: 15px;
+  height: 15px;
+}
+
+.askSelection:hover {
+  background: #b50b87;
+}
+
+@keyframes askIn {
+  from {
+    opacity: 0;
+    scale: 0.94;
+  }
+}
+
+/* "thinking": each star of the sparkle spins on its own centre, staggered */
+.thinking {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  color: #ce0e9b;
+  vertical-align: -3px;
+}
+
+.thinking svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.thinking path {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: spin 1.6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+/* big star, then the medium one, then the small one */
+.thinking path:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.thinking path:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
 .composer {
-  display: flex;
-  align-items: flex-end;
-  gap: 6px;
   margin: 0 16px 16px;
   padding: 6px 6px 6px 10px;
   background: #fff;
@@ -259,7 +518,13 @@
   color: var(--ink-3);
 }
 
-.composer button {
+.row {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.row button {
   display: grid;
   place-items: center;
   flex: none;
@@ -272,7 +537,7 @@
   cursor: pointer;
 }
 
-.composer button:disabled {
+.row button:disabled {
   color: #c4c4c6;
   cursor: default;
 }
@@ -286,6 +551,25 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .word,
+  .followups li,
+  .cards li,
+  .quote,
+  .askSelection {
+    animation: none;
+  }
+
+  /* no spinning: a gentle pulse instead */
+  .thinking path {
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    50% {
+      opacity: 0.35;
+    }
+  }
+
   .panel,
   .panel[data-open],
   .launcherLabel,

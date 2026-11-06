@@ -1,0 +1,68 @@
+/* Hover tag: over a photo, the cursor becomes a magenta square with a caption
+   riding beside it (after rachelchen.tech). Mouse/trackpad only. */
+
+.target {
+  display: block;
+}
+
+.active .target {
+  cursor: none;
+}
+
+.cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  /* zero-height row: the square and tag centre on the pointer's y */
+  height: 0;
+  pointer-events: none;
+  will-change: transform;
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+.cursorDot,
+.cursorTag {
+  opacity: 0;
+  transform: scale(0.6);
+  transform-origin: left center;
+  transition:
+    opacity 0.18s ease,
+    transform 0.22s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+
+.cursorDot {
+  width: 10px;
+  height: 10px;
+  flex: none;
+  margin-left: -5px;
+  background: #ce0e9b;
+}
+
+.cursorTag {
+  padding: 3px 8px 4px;
+  background: #ce0e9b;
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.2;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  transition-delay: 0.03s;
+}
+
+.cursor[data-visible] .cursorDot,
+.cursor[data-visible] .cursorTag {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursorDot,
+  .cursorTag {
+    transform: none;
+    transition: opacity 0.1s linear;
+  }
+}

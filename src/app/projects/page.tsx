@@ -8,9 +8,6 @@ export const metadata: Metadata = { title: 'Projects — noirrit chaki' };
 export default function Projects() {
   return (
     <main className={styles.page}>
-      <Link href="/" className={styles.eject}>
-        ⏏ eject
-      </Link>
 
       <p className={styles.kicker}>side A · tracklist</p>
       <h1 className={styles.title}>Projects</h1>
