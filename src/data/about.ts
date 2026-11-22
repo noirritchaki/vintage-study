@@ -104,5 +104,4 @@ export const photoGroups: PhotoGroup[] = [
       { ratio: 16 / 9, video: '/about/adv-5.mp4', poster: '/about/adv-5-poster.webp', alt: 'Noirrit snorkelling in clear turquoise water', caption: 'under the sea' },
     ],
   },
-  { label: 'vintage pieces', photos: [{ ratio: 4 / 5 }, { ratio: 4 / 3 }] },
 ];

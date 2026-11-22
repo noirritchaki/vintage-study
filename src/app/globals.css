@@ -63,3 +63,49 @@ html[data-surface='blue'] body {
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+/* recruiter mode: the home page inverted */
+html[data-recruiter],
+html[data-recruiter] body {
+  background: #111113;
+  color-scheme: dark;
+}
+
+/* switching modes: the new look grows out of the switch (see recruiterMode.ts) */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* phones: the fixed nav (and case-study breadcrumb) sits on a strip in the
+   page's own colour, so scrolled content never runs underneath the text */
+:root {
+  --nav-bg: #fff;
+}
+
+html:has([data-story]) {
+  --nav-bg: #f6f4ef;
+}
+
+html[data-surface='blue'] {
+  --nav-bg: #2a52d1;
+}
+
+html[data-recruiter] {
+  --nav-bg: #111113;
+}
+
+@media (max-width: 720px) {
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 49;
+    height: 56px;
+    background: var(--nav-bg);
+    pointer-events: none;
+  }
+}

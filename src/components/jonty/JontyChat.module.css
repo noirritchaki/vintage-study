@@ -584,3 +584,11 @@
 :global(html[data-surface="blue"]) .launcherLabel {
   color: #fff;
 }
+
+:global(html[data-recruiter]) .launcher {
+  color: #ff5cc8;
+}
+
+:global(html[data-recruiter]) .launcherLabel {
+  color: #ececee;
+}

@@ -261,3 +261,35 @@
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+/* phones: the sticky note can carry a long title, so let it wrap onto two
+   lines and keep it inside the screen; the nickname aside sits under the name */
+@media (max-width: 720px) {
+  .note {
+    max-width: min(240px, 60vw);
+    height: auto;
+    min-height: 32px;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .noteAnchor {
+    left: max(calc(50% - 103px * var(--u, 1)), 34vw);
+  }
+
+  .nickname {
+    left: 50%;
+    bottom: auto;
+    top: 100%;
+    transform: translate(-50%, 4px);
+  }
+
+  .nameTag:hover .nickname,
+  .nameTag:focus-visible .nickname {
+    transform: translate(-50%, 0);
+  }
+
+  .nickname svg {
+    display: none;
+  }
+}

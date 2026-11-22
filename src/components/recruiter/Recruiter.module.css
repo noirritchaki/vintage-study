@@ -1,0 +1,275 @@
+/* Recruiter mode: a quiet one-page summary, in the site's colours inverted:
+   near-black page, light text, Inter, generous space. */
+
+.page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 112px 24px 96px;
+  color: #ececee;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 12px;
+  line-height: 1.6;
+  animation: fadeIn 0.4s ease both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+.name {
+  margin: 0;
+  font-family: var(--font-story-serif), Georgia, serif;
+  font-size: 32px;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.32px;
+}
+
+.bio {
+  margin: 10px 0 0;
+  max-width: 520px;
+  font-size: 12px;
+  line-height: 1.8;
+  color: #a6a6ad;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.links a {
+  display: inline-block;
+  padding: 5px 10px;
+  border: 1px solid #34343a;
+  border-radius: 4px;
+  font-family: var(--font-code), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #ececee;
+  text-decoration: none;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.links a:hover {
+  border-color: #ff5cc8;
+  color: #ff5cc8;
+}
+
+.block {
+  margin-top: 44px;
+}
+
+.label {
+  margin: 0 0 6px;
+  font-family: var(--font-code), ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #7d7d84;
+}
+
+.rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rows li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 11px 0;
+  border-bottom: 1px solid #26262b;
+}
+
+.rows strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.rows .workTitle {
+  font-family: var(--font-story-serif), Georgia, serif;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.sub {
+  font-size: 10px;
+  color: #96969d;
+}
+
+.when {
+  flex: none;
+  font-family: var(--font-code), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.4px;
+  color: #7d7d84;
+}
+
+.cta {
+  flex: none;
+  font-family: var(--font-code), ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.72px;
+  text-transform: uppercase;
+  color: #ececee;
+  text-decoration: none;
+  border-bottom: 1px solid #55555c;
+}
+
+.cta:hover {
+  color: #ff5cc8;
+  border-color: #ff5cc8;
+}
+
+
+/* footer: a small scene, a sign-off and the links, after Elaine's */
+.footer {
+  margin-top: 96px;
+  padding-top: 8px;
+}
+
+.scene {
+  position: relative;
+  height: 170px;
+  margin: 0 auto 28px;
+  width: 280px;
+}
+
+.scene img {
+  position: absolute;
+  /* the kit's blue line art drawn light, its white fills turned dark */
+  filter: invert(1) grayscale(1) brightness(1.6) contrast(1.1);
+}
+
+.mug {
+  left: 70px;
+  bottom: 0;
+  width: 150px;
+}
+
+.steam {
+  left: 103px;
+  bottom: 92px;
+  width: 80px;
+  opacity: 0.8;
+}
+
+.beans {
+  left: 190px;
+  bottom: 2px;
+  width: 92px;
+  opacity: 0.7;
+}
+
+.footRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #26262b;
+}
+
+
+
+.logo {
+  display: block;
+  height: auto;
+}
+
+.made {
+  margin: 16px 0 0;
+  font-family: var(--font-code), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.3px;
+  color: #9a9aa1;
+}
+
+.made a {
+  color: #ececee;
+  text-decoration: none;
+  border-bottom: 1px solid #55555c;
+}
+
+.made a:hover {
+  color: #ff5cc8;
+  border-color: #ff5cc8;
+}
+
+
+.icons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.icons a {
+  display: grid;
+  place-items: center;
+  color: #c8c8ce;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.icons a:hover {
+  color: #ff5cc8;
+}
+
+.icons svg {
+  width: 18px;
+  height: 18px;
+}
+
+.resume {
+  font-family: var(--font-code), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+
+.exit {
+  padding: 0;
+  border: 0;
+  background: none;
+  margin-top: 28px;
+  font-family: var(--font-code), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #9a9aa1;
+  cursor: pointer;
+}
+
+.exit:hover {
+  color: #ff5cc8;
+}
+
+@media (max-width: 560px) {
+
+  .page {
+    padding-top: 88px;
+  }
+
+  .rows li {
+    flex-direction: column;
+    gap: 2px;
+  }
+}

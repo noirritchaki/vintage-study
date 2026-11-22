@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { Inter, Libre_Baskerville, VT323 } from 'next/font/google';
 import { SiteNav } from '@/components/SiteNav';
 import { JontyChat } from '@/components/jonty/JontyChat';
+import { code, gtAlpina } from '@/fonts/fonts';
+import { RecruiterTheme } from '@/components/recruiter/RecruiterTheme';
 import './globals.css';
 
 const inter = Inter({ variable: '--font-inter', subsets: ['latin'] });
@@ -17,8 +19,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
-    <html lang="en" className={`${inter.variable} ${vt323.variable} ${serif.variable}`}>
+    <html lang="en" className={`${inter.variable} ${vt323.variable} ${serif.variable} ${gtAlpina.variable} ${code.variable}`}>
       <body>
+        <RecruiterTheme />
         <SiteNav />
         <JontyChat />
         {children}

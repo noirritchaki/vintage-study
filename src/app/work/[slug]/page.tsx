@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: PageProps<'/work/[slug]'>): P
   const tape = workTapes.find((t) => t.slug === slug);
   return {
     title: tape ? `${tape.title} · noirrit chaki` : 'noirrit chaki',
-    description: stories[slug]?.summary ?? caseStudies[slug]?.lead ?? tape?.summary,
+    description: stories[slug]?.intro ?? caseStudies[slug]?.lead ?? tape?.summary,
   };
 }
 

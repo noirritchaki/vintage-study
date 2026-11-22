@@ -149,3 +149,13 @@
     transition: none;
   }
 }
+
+/* recruiter mode: light line and dots on the dark page */
+:global(html[data-recruiter]) .timeline {
+  --ink: #ececee;
+  --soft: rgba(236, 236, 238, 0.28);
+}
+
+:global(html[data-recruiter]) .timeline:hover .stop:not([data-active]) .label {
+  color: #9a9aa1;
+}

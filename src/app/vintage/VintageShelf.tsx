@@ -75,6 +75,7 @@ export function VintageShelf({ pieces }: { pieces: VintagePiece[] }) {
               className={styles.piece}
               tabIndex={0}
               data-below={s.y < 34 || undefined}
+              data-left={s.x > 55 || undefined}
               style={
                 {
                   left: `${s.x}%`,

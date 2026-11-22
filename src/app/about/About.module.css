@@ -239,3 +239,23 @@ a.company:hover {
     gap: 24px 12px;
   }
 }
+
+/* recruiter mode: the about page inverted */
+:global(html[data-recruiter]) :global(main):has(.bio) {
+  --ink: #ececee;
+  --ink-2: #b6b6bd;
+  --ink-3: #9a9aa1;
+}
+
+:global(html[data-recruiter]) .note > span {
+  background: #111113;
+  color: #ff5cc8;
+}
+
+:global(html[data-recruiter]) .note svg {
+  stroke: #ff5cc8;
+}
+
+:global(html[data-recruiter]) .annotated {
+  background-image: radial-gradient(circle, #55555c 1px, transparent 1.4px);
+}

@@ -206,3 +206,11 @@
 :global(html[data-surface='blue']) .fill {
   fill: #2a52d1;
 }
+
+:global(html[data-recruiter]) .weather {
+  color: #9a9aa1;
+}
+
+:global(html[data-recruiter]) .fill {
+  fill: #111113;
+}

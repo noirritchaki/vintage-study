@@ -1,11 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useId, useRef, useState, type CSSProperties } from 'react';
 import { pageIndexFor, pageNameFor, pages } from '@/data/pages';
 import styles from './SiteNav.module.css';
 import { Weather } from './Weather';
+import { setRecruiterMode, setRecruiterModeFrom, useRecruiterMode } from '@/lib/recruiterMode';
 
 /**
  * Site navigation as plain text: the current page's name, top-left. Hover (or
@@ -14,6 +15,8 @@ import { Weather } from './Weather';
  */
 export function SiteNav() {
   const pathname = usePathname();
+  const router = useRouter();
+  const recruiter = useRecruiterMode();
   const current = pageIndexFor(pathname);
   const name = pageNameFor(pathname);
   const [open, setOpen] = useState(false);
@@ -99,6 +102,28 @@ export function SiteNav() {
         </ul>
       </nav>
       <Weather />
+      {/* a plain, one-page version of the site for people short on time */}
+      <button
+        type="button"
+        className={styles.recruiter}
+        role="switch"
+        aria-checked={recruiter}
+        onClick={(e) => {
+          if (pathname !== '/') {
+            setRecruiterMode(!recruiter);
+            if (!recruiter) router.push('/');
+            return;
+          }
+          // the new look spreads out from the switch itself
+          const box = e.currentTarget.querySelector('span')!.getBoundingClientRect();
+          setRecruiterModeFrom(!recruiter, box.left + box.width / 2, box.top + box.height / 2);
+        }}
+      >
+        <span className={styles.switchTrack} aria-hidden>
+          <span />
+        </span>
+        recruiter mode
+      </button>
     </div>
   );
 }

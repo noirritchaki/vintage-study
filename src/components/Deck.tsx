@@ -332,23 +332,9 @@ export function Deck({ labelFont }: { labelFont: string }) {
             {hint}
           </p>
 
-          <footer className={styles.footer}>
-            <span>
-              Walkman by{" "}
-              <a href="https://sketchfab.com/3d-models/sony-walkman-professional-wm-d6c-fa57b1cf2cf34746baecc3fe1736b704">
-                Nedotyopa
-              </a>
-              , tapes by{" "}
-              <a href="https://sketchfab.com/3d-models/cassette-tape-d12bc8517ecb470f87862e1c24250d91">
-                Zian
-              </a>{" "}
-              (
-              <a href="http://creativecommons.org/licenses/by/4.0/">
-                CC BY 4.0
-              </a>
-              )
-            </span>
-          </footer>
+          {/* TODO before launch: restore the CC BY 4.0 credits for the 3D models:
+              Walkman by Nedotyopa (sketchfab.com/3d-models/sony-walkman-professional-wm-d6c-fa57b1cf2cf34746baecc3fe1736b704)
+              and tapes by Zian (sketchfab.com/3d-models/cassette-tape-d12bc8517ecb470f87862e1c24250d91). */}
         </div>
 
         <nav className={styles.srOnly} aria-label="Tapes">

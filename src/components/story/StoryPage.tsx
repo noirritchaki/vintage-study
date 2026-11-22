@@ -1,17 +1,11 @@
-import { Fraunces, Source_Code_Pro } from 'next/font/google';
 import Image from 'next/image';
 import Link from 'next/link';
-import type { Media, Story, StoryBlock } from '@/data/stories';
+import type { Hypothesis, Media, Story, StoryBlock } from '@/data/stories';
 import { tapes, hrefFor } from '@/data/tapes';
 import { CaseStudyToc } from '@/components/CaseStudyToc';
 import { SolutionVideo } from '@/components/SolutionVideo';
 import styles from './Story.module.css';
 import page from '@/components/TapePage.module.css';
-
-// A light, soft serif for headings and a mono for the small labels, standing in
-// for the reference's Gelica and Source Code Pro.
-const serif = Fraunces({ subsets: ['latin'], weight: ['300', '400'], variable: '--font-story-serif' });
-const code = Source_Code_Pro({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-code' });
 
 /** An image, a looping video, or (until one is added) a watercolor placeholder. */
 function MediaView({ media, label, tall }: { media?: Media; label: string; tall?: boolean }) {
@@ -53,28 +47,83 @@ const Pros = ({ items, sign }: { items: string[]; sign: '+' | '−' }) => (
   </ul>
 );
 
-function Block({ block }: { block: StoryBlock }) {
+const STATUS: Record<Hypothesis['status'], string> = {
+  validated: 'Validated',
+  partly: 'Partly validated',
+  disproved: 'Disproved',
+  measuring: 'Still measuring',
+};
+
+/** Hypotheses as set at the start, or checked against what happened. */
+function Hypotheses({ items, show }: { items: Hypothesis[]; show: 'set' | 'result' }) {
+  return (
+    <ol className={styles.hypotheses} data-show={show}>
+      {items.map((h, i) => (
+        <li key={i}>
+          <p className={styles.hypNum}>H{i + 1}</p>
+          <div>
+            <p className={styles.hypBelief}>{h.belief}</p>
+            {show === 'set' ? (
+              <dl className={styles.hypDetail}>
+                <dt>Because</dt>
+                <dd>{h.because}</dd>
+                <dt>We’d know by</dt>
+                <dd>{h.measure}</dd>
+              </dl>
+            ) : (
+              <>
+                <span className={styles.hypStatus} data-status={h.status}>
+                  {STATUS[h.status]}
+                </span>
+                <p className={styles.hypResult}>{h.result}</p>
+              </>
+            )}
+          </div>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+function Block({ block, story }: { block: StoryBlock; story: Story }) {
   switch (block.type) {
     case 'text':
       return <p className={styles.text}>{block.text}</p>;
+    case 'decisions':
+      return (
+        <ol className={styles.decisions}>
+          {block.items.map((d, i) => (
+            <li key={d.title}>
+              <h3>
+                {String(i + 1).padStart(2, '0')} · {d.title}
+              </h3>
+              <p>{d.text}</p>
+              {d.media && <MediaView media={d.media} label={d.title} />}
+            </li>
+          ))}
+        </ol>
+      );
+    case 'hypotheses':
+      return <Hypotheses items={story.hypotheses} show={block.show} />;
+    case 'subhead':
+      return <h3 className={styles.subhead}>{block.text}</h3>;
+    case 'stats':
+      return (
+        <ul className={styles.stats}>
+          {block.items.map((st) => (
+            <li key={st.label}>
+              <span className={styles.statValue}>{st.value}</span>
+              <span className={styles.statLabel}>{st.label}</span>
+            </li>
+          ))}
+        </ul>
+      );
     case 'statement':
       return (
         <aside className={styles.statement}>
           <p className={styles.statementLabel}>{block.label}</p>
           <p className={styles.statementText}>{block.text}</p>
         </aside>
-      );
-    case 'cards':
-      return (
-        <ul className={styles.cards}>
-          {block.cards.map((c) => (
-            <li key={c.title}>
-              <MediaView media={c.media} label={c.title} />
-              <h3>{c.title}</h3>
-              <p>{c.text}</p>
-            </li>
-          ))}
-        </ul>
       );
     case 'options':
       return (
@@ -174,29 +223,6 @@ function Block({ block }: { block: StoryBlock }) {
           </table>
         </div>
       );
-    case 'flows':
-      return (
-        <ol className={styles.flows}>
-          {block.flows.map((f) => (
-            <li key={f.title}>
-              <MediaView media={f.media} label={f.title} tall />
-              <h3>{f.title}</h3>
-              <p>{f.text}</p>
-            </li>
-          ))}
-        </ol>
-      );
-    case 'learnings':
-      return (
-        <ul className={styles.learnings}>
-          {block.items.map((l) => (
-            <li key={l.title}>
-              <h3>{l.title}</h3>
-              <p>{l.text}</p>
-            </li>
-          ))}
-        </ul>
-      );
     case 'figure':
       return (
         <figure className={styles.figure}>
@@ -208,15 +234,14 @@ function Block({ block }: { block: StoryBlock }) {
 }
 
 /**
- * A case study told as a story: hero, tags, title, role/team/timeline/skills,
- * impact, then labelled sections (with explorations and final picks), key
- * flows, reflection and a "next up" link. Modelled on meganyap.me/work/splunk.
+ * A case study after elaineyu.design: a meta card, the title, an intro and
+ * tags, then six numbered sections and a "next stop" link, with the timeline
+ * of sections pinned to the left.
  */
 export function StoryPage({ slug, story }: { slug: string; story: Story }) {
   const next = story.nextUp ? tapes.find((t) => t.slug === story.nextUp) : undefined;
   return (
-    <div className={`${styles.page} ${serif.variable} ${code.variable}`}>
-      {/* the same "⏏ eject / title" breadcrumb as the other case studies */}
+    <div className={styles.page} data-story>
       <nav className={page.crumbs} aria-label="Breadcrumb">
         <Link href={`/?tape=${slug}`} className={page.crumbBack}>
           ⏏ eject
@@ -224,23 +249,18 @@ export function StoryPage({ slug, story }: { slug: string; story: Story }) {
         <span aria-hidden>/</span>
         <span aria-current="page">{story.title}</span>
       </nav>
-      <CaseStudyToc items={story.sections.map((s) => ({ id: s.id, label: s.nav }))} />
+      <CaseStudyToc items={story.sections.map((s) => ({ id: s.id, label: s.label }))} />
 
       <main className={styles.main}>
-        <MediaView media={story.hero} label={story.title} tall />
+        {/* the hero design anchors the page */}
+        {story.hero && <MediaView media={story.hero} label={story.title} tall />}
 
+        <h1 className={styles.title}>{story.title}</h1>
         <ul className={styles.tags}>
           {story.tags.map((t) => (
             <li key={t}>{t}</li>
           ))}
         </ul>
-        <h1 className={styles.title}>
-          <span aria-hidden className={styles.star}>
-            ✳
-          </span>{' '}
-          {story.title}
-        </h1>
-        <p className={styles.summary}>{story.summary}</p>
 
         <dl className={styles.meta}>
           <div>
@@ -248,53 +268,56 @@ export function StoryPage({ slug, story }: { slug: string; story: Story }) {
             <dd>{story.meta.role}</dd>
           </div>
           <div>
-            <dt>Team</dt>
-            {story.meta.team.map((t) => (
-              <dd key={t}>{t}</dd>
-            ))}
-          </div>
-          <div>
             <dt>Timeline</dt>
-            {story.meta.timeline.map((t) => (
-              <dd key={t}>{t}</dd>
-            ))}
+            <dd>{story.meta.timeline}</dd>
           </div>
           <div>
-            <dt>Skills</dt>
-            {story.meta.skills.map((t) => (
-              <dd key={t}>{t}</dd>
-            ))}
+            <dt>Tools</dt>
+            <dd>{story.meta.tools}</dd>
+          </div>
+          <div>
+            <dt>Team</dt>
+            <dd>{story.meta.team}</dd>
           </div>
         </dl>
 
-        <section className={styles.impact} aria-label="Impact">
-          <p className={styles.label}>Impact</p>
+        <section className={styles.tldr} aria-label="TL;DR">
+          <p className={styles.tldrLabel}>TL;DR</p>
+          <p className={styles.tldrText}>{story.intro}</p>
           <ul>
-            {story.impact.map((i) => (
-              <li key={i.label}>
-                <span className={styles.impactValue}>{i.value}</span>
-                <span className={styles.impactLabel}>{i.label}</span>
+            {story.tldr.map((m) => (
+              <li key={m.label}>
+                <span className={styles.tldrValue}>
+                  {m.trend && (
+                    <span className={styles.trend} data-trend={m.trend} aria-label={m.trend === 'up' ? 'up' : 'down'}>
+                      {m.trend === 'up' ? '↑' : '↓'}
+                    </span>
+                  )}
+                  {m.value}
+                </span>
+                <span className={styles.tldrMetric}>{m.label}</span>
               </li>
             ))}
           </ul>
         </section>
 
-        {story.sections.map((s) => (
+        {story.sections.map((s, i) => (
           <section key={s.id} id={s.id} className={styles.section}>
-            <p className={styles.label}>{s.label}</p>
+            <p className={styles.label}>
+              {String(i + 1).padStart(2, '0')} — {s.label}
+            </p>
             <h2 className={styles.heading}>{s.heading}</h2>
-            {s.blocks.map((b, i) => (
-              <Block key={i} block={b} />
+            {s.blocks.map((b, k) => (
+              <Block key={k} block={b} story={story} />
             ))}
           </section>
         ))}
 
         {next && (
           <Link href={hrefFor(next)} className={styles.next}>
-            <span className={styles.label}>Next up</span>
+            <span className={styles.label}>Next stop →</span>
             <span className={styles.nextTitle}>{next.title}</span>
             <span className={styles.nextSummary}>{next.summary}</span>
-            <span className={styles.nextCta}>Read next →</span>
           </Link>
         )}
       </main>

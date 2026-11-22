@@ -56,10 +56,16 @@ function storyBlockText(b: StoryBlock): string {
   switch (b.type) {
     case 'text':
       return b.text;
+    case 'decisions':
+      return b.items.map((d, i) => `${i + 1}. ${d.title}: ${d.text}`).join('\n');
+    case 'hypotheses':
+      return '';
+    case 'subhead':
+      return `#### ${b.text}`;
+    case 'stats':
+      return b.items.map((x) => `- ${x.value}: ${x.label}`).join('\n');
     case 'statement':
       return `${b.label}: ${b.text}`;
-    case 'cards':
-      return b.cards.map((c) => `- ${c.title}: ${c.text}`).join('\n');
     case 'options':
       return b.options
         .map((o) => `- Option "${o.title}". Pros: ${o.pros.join('; ')}. Cons: ${o.cons.join('; ')}.`)
@@ -70,10 +76,6 @@ function storyBlockText(b: StoryBlock): string {
       return b.items.map((i) => `- ${i.lead ? i.lead + ' ' : ''}${i.text}`).join('\n');
     case 'table':
       return [b.columns.join(' | '), ...b.rows.map((r) => r.join(' | '))].join('\n');
-    case 'flows':
-      return b.flows.map((f) => `- ${f.title}: ${f.text}`).join('\n');
-    case 'learnings':
-      return b.items.map((l) => `- ${l.title}: ${l.text}`).join('\n');
     case 'quote':
       return `A user said: "${b.text}" (${b.cite})`;
     case 'scale':
@@ -89,10 +91,11 @@ function storyText() {
     .map(([slug, st]) =>
       [
         `## Case study: ${st.title}`,
-        `Page: /work/${slug}. Role: ${st.meta.role}. Team: ${st.meta.team.join(', ')}. Timeline: ${st.meta.timeline.join(' ')}. Skills: ${st.meta.skills.join(', ')}.`,
-        st.summary,
-        `Impact:\n${st.impact.map((i) => `- ${i.value}: ${i.label}`).join('\n')}`,
-        ...st.sections.map((sec) => `### ${sec.label}: ${sec.heading}\n${sec.blocks.map(storyBlockText).filter(Boolean).join('\n')}`),
+        `Page: /work/${slug}. Role: ${st.meta.role}. Team: ${st.meta.team}. Timeline: ${st.meta.timeline}. Tools: ${st.meta.tools}.`,
+        st.intro,
+        `Headline numbers: ${st.tldr.map((m) => `${m.trend === 'up' ? '+' : m.trend === 'down' ? '-' : ''}${m.value} ${m.label}`).join('; ')}`,
+        `Hypotheses I set from the data, and whether they held:\n${st.hypotheses.map((h, i) => `H${i + 1}: ${h.belief} Because: ${h.because} Measured by: ${h.measure} Status: ${h.status}. ${h.result}`).join('\n')}`,
+        ...st.sections.map((sec, i) => `### ${i + 1}. ${sec.label}: ${sec.heading}\n${sec.blocks.map(storyBlockText).filter(Boolean).join('\n')}`),
       ].join('\n\n'),
     )
     .join('\n\n');

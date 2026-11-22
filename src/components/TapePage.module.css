@@ -768,3 +768,16 @@
 .anchor {
   scroll-margin-top: 48px;
 }
+
+/* recruiter mode: the breadcrumb on a dark page */
+:global(html[data-recruiter]) .crumbs {
+  color: #ececee;
+}
+
+:global(html[data-recruiter]) .crumbs > span[aria-hidden] {
+  color: #4a4a50;
+}
+
+:global(html[data-recruiter]) .crumbBack {
+  color: #9a9aa1;
+}

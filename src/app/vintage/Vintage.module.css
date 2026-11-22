@@ -236,6 +236,35 @@
   stroke-dashoffset: 0;
 }
 
+/* pieces on the right half open their note to the left, so it stays on screen */
+.piece[data-left] .note {
+  left: auto;
+  right: 30%;
+  flex-direction: row-reverse;
+}
+
+.piece[data-left] .note svg {
+  transform: scaleX(-1);
+}
+
+.piece[data-left][data-below] .note svg {
+  transform: scale(-1, -1);
+}
+
+.piece[data-left] .note > span {
+  margin: -12px 2px 0 0;
+  text-align: right;
+}
+
+.piece[data-left][data-below] .note {
+  flex-direction: column-reverse;
+  align-items: flex-end;
+}
+
+.piece[data-left][data-below] .note > span {
+  margin: 0 30px -12px 0;
+}
+
 /* phones: smaller pieces, spread wider */
 @media (max-width: 720px) {
   /* two lines on phones, so the pieces at the sides have room */

@@ -1,21 +1,26 @@
-/* The story layout's look, after meganyap.me/work/splunk: warm cream page,
-   light serif headings, small uppercase mono labels, an orange accent, beige
-   cards, rounded media frames (here filled with the site's watercolor). */
+/* Case study layout, structured after elaineyu.design: meta card, title, intro,
+   tags, then numbered sections. Neutral page with pastel accents, GT Alpina
+   headings, Inter body, small mono labels, watercolor media frames. */
 
 .page {
-  --cream: #f3f1eb;
-  --ink: #242424;
-  --muted: #666;
-  --orange: #cb7836;
-  --peach: #f7c9a5;
-  --beige: #eae6db;
-  --beige-2: #dbd4bf;
-  --line: rgba(36, 36, 36, 0.1);
+  --cream: #f6f4ef; /* warm neutral page */
+  --ink: #2b2a28;
+  --muted: #6e6b66;
+  --line: rgba(43, 42, 40, 0.1);
+  --card: #ffffff;
+  --sage: #e3ebdf; /* pastel accents */
+  --lilac: #e8e3f2;
+  --peach: #f5e6dc;
+  --butter: #f3eed9;
+  --mist: #e2ecef;
+  --orange: #8a7f72; /* soft taupe for small accents (kept name for shared rules) */
+  --beige: #efece5;
+  --beige-2: #e6e2d9;
   --serif: var(--font-story-serif), Georgia, serif;
   --mono: var(--font-code), ui-monospace, monospace;
   --page-bg: var(--cream); /* behind the timeline's dots */
   display: grid;
-  grid-template-columns: minmax(0, 840px);
+  grid-template-columns: minmax(0, 720px);
   justify-content: center;
   min-height: 100vh;
   padding: 72px 40px 120px; /* clears the fixed breadcrumb */
@@ -23,7 +28,7 @@
   color: var(--ink);
   font-family: var(--font-inter), system-ui, sans-serif;
   font-size: 16px;
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
 /* ---- header ---- */
@@ -76,133 +81,86 @@
 
 .tags {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  margin: 28px 0 10px;
+  margin: 14px 0 24px;
   padding: 0;
   list-style: none;
 }
 
 .tags li {
-  padding: 2px 8px;
+  padding: 3px 10px;
   border: 1px solid var(--line);
-  border-radius: 4px;
-  background: var(--beige);
+  border-radius: 999px;
+  background: var(--lilac);
   font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.4px;
+  font-size: 11px;
+  letter-spacing: 0.6px;
   text-transform: uppercase;
-  color: var(--muted);
+  color: #57516b;
 }
 
 .title {
-  margin: 0;
+  margin: 36px 0 0;
   font-family: var(--serif);
-  font-size: 40px;
+  font-size: 48px;
   font-weight: 300;
-  line-height: 1.1;
-  letter-spacing: -0.5px;
-}
-
-.star {
-  color: var(--orange);
-}
-
-.summary {
-  margin: 12px 0 0;
-  color: var(--muted);
-  line-height: 1.65;
+  line-height: 1.08;
+  letter-spacing: -0.6px;
 }
 
 /* role / team / timeline / skills on an orange bar */
 .meta {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
-  margin: 28px 0 0;
-  padding: 16px;
-  border-radius: 12px;
-  background: var(--orange);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 28px;
+  margin: 0 0 16px;
+  padding: 22px 24px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card);
 }
 
 .meta dt {
   margin-bottom: 4px;
   font-family: var(--mono);
-  font-size: 13px;
-  letter-spacing: 0.4px;
+  font-size: 11px;
+  letter-spacing: 0.8px;
   text-transform: uppercase;
-  color: #fff;
+  color: var(--muted);
 }
 
 .meta dd {
   margin: 0;
   font-size: 14px;
   line-height: 1.5;
-  color: var(--peach);
+  color: var(--ink);
 }
 
 /* ---- labels and section headings ---- */
 
 .label {
   display: block;
-  margin: 0 0 8px;
+  margin: 0 0 10px;
   font-family: var(--mono);
   font-size: 12px;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.impact {
-  margin-top: 40px;
-}
-
-.impact ul {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.impact li {
-  display: grid;
-  gap: 10px;
-  align-content: start;
-  padding: 14px 16px 16px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--beige);
-}
-
-.impactValue {
-  font-family: var(--serif);
-  font-size: 30px;
-  font-weight: 300;
-  line-height: 1.05;
-}
-
-.impactLabel {
-  font-family: var(--mono);
-  font-size: 11px;
-  line-height: 1.5;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.8px;
   text-transform: uppercase;
   color: var(--muted);
 }
 
 .section {
-  margin-top: 72px;
+  margin-top: 88px;
   scroll-margin-top: 72px; /* clear of the fixed breadcrumb */
 }
 
 .heading {
-  margin: 0 0 16px;
+  margin: 0 0 18px;
   font-family: var(--serif);
-  font-size: 28px;
+  font-size: 30px;
   font-weight: 300;
-  line-height: 1.15;
-  letter-spacing: -0.2px;
+  line-height: 1.2;
+  letter-spacing: -0.3px;
 }
 
 .text {
@@ -215,72 +173,27 @@
 /* problem statement / user insight / my goal: an orange callout */
 .statement {
   margin: 28px 0;
-  padding: 28px 36px 32px;
+  padding: 24px 28px;
   border-radius: 12px;
-  background: var(--orange);
-  text-align: center;
+  background: var(--sage);
 }
 
 .statementLabel {
   margin: 0 0 8px;
   font-family: var(--mono);
   font-size: 11px;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.8px;
   text-transform: uppercase;
-  color: var(--peach);
+  color: #5d6b58;
 }
 
 .statementText {
   margin: 0;
   font-family: var(--serif);
-  font-size: 21px;
+  font-size: 22px;
   font-weight: 300;
-  line-height: 1.45;
-  color: var(--cream);
-}
-
-.cards {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-  margin: 8px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.cards li {
-  padding: 10px 10px 16px;
-  border-radius: 16px;
-  background: var(--beige);
-}
-
-.cards .frame {
-  aspect-ratio: 4 / 3;
-  border-radius: 12px;
-}
-
-.cards h3,
-.options h3,
-.flows h3,
-.learnings h3 {
-  margin: 14px 0 6px;
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 1.35;
-}
-
-.cards p,
-.flows p,
-.learnings p {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--muted);
-}
-
-.cards h3,
-.cards p {
-  padding: 0 4px;
+  line-height: 1.4;
+  color: var(--ink);
 }
 
 /* explorations: the picture, then what worked and what didn't */
@@ -300,7 +213,10 @@
 }
 
 .options h3 {
-  margin-top: 0;
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.35;
 }
 
 .proscons {
@@ -432,37 +348,6 @@
   border-top: 1px solid var(--line);
 }
 
-.flows {
-  display: grid;
-  gap: 40px;
-  margin: 24px 0 0;
-  padding: 0;
-  list-style: none;
-  counter-reset: flow;
-}
-
-.flows h3 {
-  margin-top: 16px;
-  font-family: var(--serif);
-  font-size: 22px;
-  font-weight: 300;
-}
-
-.learnings {
-  display: grid;
-  gap: 22px;
-  margin: 24px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.learnings h3 {
-  margin: 0 0 4px;
-  font-family: var(--serif);
-  font-size: 20px;
-  font-weight: 300;
-}
-
 .figure {
   margin: 24px 0;
 }
@@ -573,6 +458,232 @@
   background: #fdeaea;
 }
 
+/* numbered decisions: "01 · Title", text, then the design */
+.decisions {
+  display: grid;
+  gap: 44px;
+  margin: 28px 0 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.decisions h3 {
+  margin: 0 0 6px;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.2px;
+}
+
+.decisions p {
+  margin: 0 0 16px;
+}
+
+.subhead {
+  margin: 48px 0 10px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* impact numbers, each on a different pastel */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 8px 0 28px;
+  padding: 0;
+  list-style: none;
+}
+
+.stats li {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  padding: 18px 18px 20px;
+  border-radius: 10px;
+  background: var(--peach);
+}
+
+.stats li:nth-child(2) {
+  background: var(--mist);
+}
+
+.stats li:nth-child(3) {
+  background: var(--butter);
+}
+
+.statValue {
+  font-family: var(--serif);
+  font-size: 34px;
+  font-weight: 300;
+  line-height: 1.05;
+}
+
+.statLabel {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+/* the TL;DR card under the meta: summary, then up to three numbers */
+.tldr {
+  margin: 0 0 8px;
+  padding: 24px 28px 26px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card);
+}
+
+.tldrLabel {
+  margin: 0 0 10px;
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.4px;
+  color: var(--muted);
+}
+
+.tldrText {
+  margin: 0;
+  color: #55524d;
+  line-height: 1.65;
+}
+
+.tldr ul {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tldr li {
+  display: grid;
+  gap: 2px;
+  align-content: start;
+}
+
+.tldrValue {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.4px;
+  color: var(--ink);
+}
+
+.trend[data-trend='up'] {
+  color: #4f8a52;
+}
+
+.trend[data-trend='down'] {
+  color: #4f8a52; /* a fall in something bad is still good news */
+}
+
+.tldrMetric {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* hypotheses: numbered bets, set in Goal and checked in Impact */
+.hypotheses {
+  display: grid;
+  gap: 12px;
+  margin: 8px 0 24px;
+  padding: 0;
+  list-style: none;
+}
+
+.hypotheses > li {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 12px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card);
+}
+
+.hypNum {
+  margin: 2px 0 0;
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 300;
+  color: var(--muted);
+}
+
+.hypBelief {
+  margin: 0;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.hypDetail {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 6px 12px;
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.hypDetail dt {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-top: 2px;
+}
+
+.hypDetail dd {
+  margin: 0;
+  color: #55524d;
+}
+
+.hypStatus {
+  display: inline-block;
+  margin: 10px 0 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.hypStatus[data-status='validated'] {
+  background: var(--sage);
+  color: #47613f;
+}
+
+.hypStatus[data-status='partly'] {
+  background: var(--butter);
+  color: #7a6526;
+}
+
+.hypStatus[data-status='disproved'] {
+  background: var(--peach);
+  color: #8a4b33;
+}
+
+.hypStatus[data-status='measuring'] {
+  background: var(--mist);
+  color: #3f6470;
+}
+
+.hypResult {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #55524d;
+}
+
 /* ---- next up ---- */
 
 .next {
@@ -602,15 +713,6 @@
   color: var(--muted);
 }
 
-.nextCta {
-  margin-top: 8px;
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-  color: var(--orange);
-}
-
 /* ---- narrower screens ---- */
 
 @media (max-width: 1100px) {
@@ -626,11 +728,11 @@
   }
 
   .meta {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
   }
 
-  .impact ul,
-  .cards {
+  .stats,
+  .tldr ul {
     grid-template-columns: 1fr;
   }
 
@@ -646,4 +748,80 @@
   .statementText {
     font-size: 18px;
   }
+}
+
+/* ---- recruiter mode: the same page, inverted ---- */
+
+:global(html[data-recruiter]) .page {
+  --cream: #111113;
+  --ink: #ececee;
+  --muted: #9a9aa1;
+  --line: rgba(236, 236, 238, 0.1);
+  --card: #1a1a1e;
+  --sage: #1e2a22; /* the pastels, deepened */
+  --lilac: #26223a;
+  --peach: #33251f;
+  --butter: #2f2a1b;
+  --mist: #1b2a2f;
+  --orange: #9a8f82;
+  --beige: #1d1d21;
+  --beige-2: #26262b;
+}
+
+:global(html[data-recruiter]) .tags li {
+  color: #c8c0e6;
+}
+
+:global(html[data-recruiter]) .statementLabel {
+  color: #a9c2a0;
+}
+
+:global(html[data-recruiter]) .tldrText,
+:global(html[data-recruiter]) .hypDetail dd,
+:global(html[data-recruiter]) .hypResult,
+:global(html[data-recruiter]) .table td {
+  color: #b6b6bd;
+}
+
+:global(html[data-recruiter]) .tableWrap {
+  background: var(--card);
+}
+
+:global(html[data-recruiter]) .frame[data-fit='plain'] {
+  background: #f4f4f2; /* charts are drawn on white; keep them readable */
+}
+
+:global(html[data-recruiter]) .hypStatus[data-status='validated'] {
+  color: #a9c2a0;
+}
+
+:global(html[data-recruiter]) .hypStatus[data-status='partly'] {
+  color: #e2cf8c;
+}
+
+:global(html[data-recruiter]) .hypStatus[data-status='disproved'] {
+  color: #e8a68c;
+}
+
+:global(html[data-recruiter]) .hypStatus[data-status='measuring'] {
+  color: #9cc6d3;
+}
+
+:global(html[data-recruiter]) .trend {
+  color: #8fc493;
+}
+
+:global(html[data-recruiter]) .level[data-tone='good'] {
+  color: #8fd0a6;
+  background: #16261c;
+}
+
+:global(html[data-recruiter]) .level[data-tone='warn'] {
+  color: #e6c46e;
+  background: #2b2414;
+}
+
+:global(html[data-recruiter]) .level[data-tone='bad'] {
+  color: #f09a9a;
+  background: #2e1818;
 }

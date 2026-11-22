@@ -132,6 +132,67 @@
   }
 }
 
+/* recruiter mode switch, after the weather */
+.recruiter {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #a3a3a8;
+  font: inherit;
+  letter-spacing: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.recruiter:hover,
+.recruiter[aria-checked='true'] {
+  color: #1f1f22;
+}
+
+.recruiter:focus-visible {
+  outline: 2px dotted #1f1f22;
+  outline-offset: 3px;
+}
+
+.switchTrack {
+  position: relative;
+  width: 24px;
+  height: 14px;
+  border-radius: 999px;
+  background: #e2e2e5;
+  transition: background 0.2s ease;
+}
+
+.switchTrack span {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.recruiter[aria-checked='true'] .switchTrack {
+  background: #ce0e9b;
+}
+
+.recruiter[aria-checked='true'] .switchTrack span {
+  transform: translateX(10px);
+}
+
+@media (max-width: 560px) {
+  .recruiter {
+    font-size: 0; /* just the switch on small phones */
+  }
+}
+
 /* the brew page sits on its own blue, so the nav goes white there */
 :global(html[data-surface='blue']) .current,
 :global(html[data-surface='blue']) .item {
@@ -160,4 +221,79 @@
 :global(html[data-surface='blue']) .nav[data-open] .menu {
   background: #2a52d1;
   box-shadow: 0 8px 24px rgba(20, 40, 120, 0.25);
+}
+
+:global(html[data-surface='blue']) .recruiter {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+/* recruiter mode inverts the page, so the nav goes light */
+:global(html[data-recruiter]) .current,
+:global(html[data-recruiter]) .item,
+:global(html[data-recruiter]) .recruiter {
+  color: #9a9aa1;
+}
+
+:global(html[data-recruiter]) .recruiter[aria-checked='true'],
+:global(html[data-recruiter]) .item:hover,
+:global(html[data-recruiter]) .current:hover {
+  color: #ececee;
+}
+
+:global(html[data-recruiter]) .switchTrack {
+  background: #ff5cc8;
+}
+
+:global(html[data-recruiter]) .nav[data-open] .menu {
+  background: #111113;
+}
+
+/* phones: the open menu is a solid card with roomy, thumb-sized rows, so it
+   never sits on top of the page text */
+@media (max-width: 720px) {
+  .menu {
+    left: -6px;
+    min-width: 210px;
+    margin-top: 6px;
+    padding: 6px;
+    border-radius: 12px;
+    background: transparent;
+    transition: background 0.2s ease;
+  }
+
+  .nav[data-open] .menu {
+    background: #fff;
+    box-shadow:
+      0 10px 30px rgba(20, 20, 30, 0.14),
+      0 0 0 1px rgba(20, 20, 30, 0.06);
+  }
+
+  .item {
+    padding: 10px 10px;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #4a4a4f;
+  }
+
+  .item:active {
+    background: rgba(206, 14, 155, 0.08);
+  }
+
+  :global(html[data-surface='blue']) .nav[data-open] .menu {
+    background: #2a52d1;
+  }
+
+  :global(html[data-recruiter]) .nav[data-open] .menu {
+    background: #1a1a1e;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+  }
+
+  :global(html[data-recruiter]) .item {
+    color: #c8c8ce;
+  }
+
+  /* the bar: a little tighter so name, weather and switch fit on small phones */
+  .bar {
+    gap: 14px;
+  }
 }
